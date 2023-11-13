@@ -7,12 +7,12 @@ RUN apt-get update && apt-get install -y \
     zip \
   && rm -rf /var/lib/apt/lists/*
 
-ENV RDP_ZIP rdp_classifier_2.14.zip
-ENV RDP_VERSION 2.14
-ENV RDP_DOWNLOAD https://sourceforge.net/projects/rdp-classifier/files/rdp-classifier/$RDP_ZIP/download
-ENV RDPPATH /opt/rdp_classifier
+ENV rdp_zip rdp_classifier_2.14.zip
+ENV rdp_version 2.14
+ENV rdp_download https://sourceforge.net/projects/rdp-classifier/files/rdp-classifier/$rdp_zip/download
+ENV rdp_path /opt/rdp_classifier
 
-RUN wget $RDP_DOWNLOAD -O /tmp/$RDP_ZIP \
-  && unzip /tmp/$RDP_ZIP -d /tmp \
-  && mv /tmp/${RDP_ZIP%.*} $RDPPATH \
-  && rm -rf /tmp/$RDP_ZIP
+RUN wget $rdp_download -O /tmp/$rdp_zip \
+  && unzip /tmp/$rdp_zip -d /tmp \
+  && mv /tmp/${rdp_zip%.*} $rdp_path \
+  && rm -rf /tmp/$rdp_zip
