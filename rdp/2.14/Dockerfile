@@ -1,19 +1,19 @@
 # set global variables
-ARG rdp_ver="2.14"
+ARG RDP_VER="2.14"
 
 # build Dockerfile
 FROM ubuntu:focal as builder
-ARG rdp_ver
+ARG RDP_VER
 
 LABEL base.image="ubuntu:focal"
 LABEL dockerfile.version="2.14"
 LABEL software="RDP Classifier"
-LABEL software.version=${rdp_ver}
+LABEL software.version=${RDP_VER}
 LABEL description="The RDP Classifier is a naive Bayesian classifier which was developed to provide rapid taxonomic placement based on rRNA sequence data."
 LABEL website="https://sourceforge.net/projects/rdp-classifier/"
 LABEL license.url="https://github.com/rdpstaff/classifier/blob/master/LICENSE"
 LABEL maintainer="Taylor K. Paisie"
-LABEL maintainer.email='ltj8@cdc.gov'
+LABEL maintainer.email='tpaisie91@gmail.com'
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
@@ -23,15 +23,17 @@ RUN apt-get update && apt-get install -y \
     zip 
 
 # Install RDP
-ENV rdp_zip rdp_classifier_2.14.zip
-ENV rdp_version 2.14
-ENV rdp_download https://sourceforge.net/projects/rdp-classifier/files/rdp-classifier/rdp_classifier_2.14.zip/download
-ENV rdp_path /rdp_classifier
-RUN wget $rdp_download -O /tmp/$rdp_zip \
-  && unzip /tmp/$rdp_zip -d /tmp \
-  && mv /tmp/${rdp_zip%.*} $rdp_path \
-  && rm -rf /tmp/$rdp_zip
+ENV RDP_ZIP rdp_classifier_2.14.zip
+ENV RDP_DOWNLOAD https://sourceforge.net/projects/rdp-classifier/files/rdp-classifier/rdp_classifier_2.14.zip/download
+ENV RDP_PATH /rdp_classifier
 
+RUN wget $RDP_DOWNLOAD -O /tmp/$RDP_ZIP \
+  && unzip /tmp/$RDP_ZIP -d /tmp \
+  && mv /tmp/${RDP_ZIP%.*} $RDP_PATH \
+  && rm -rf /tmp/$RDP_ZIP \
+  && chmod +x /${RDP_PATH}/dist/classifier.jar
+
+ENV PATH="${PATH}:${RDP_PATH}/dist/"
 
 # Run Dockerfile
 # FROM ubuntu:focal as app
