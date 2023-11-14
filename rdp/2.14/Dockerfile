@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y \
     default-jre \
     wget \
     curl \
-    zip 
+    unzip 
 
 # Install RDP
 ENV RDP_ZIP rdp_classifier_2.14.zip
