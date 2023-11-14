@@ -33,6 +33,7 @@ RUN wget $RDP_DOWNLOAD -O /tmp/$RDP_ZIP \
   && rm -rf /tmp/$RDP_ZIP \
   && chmod +x /${RDP_PATH}/dist/classifier.jar
 
+# need to get this to work in the working directory
 ENV PATH="${PATH}:${RDP_PATH}/dist/"
 
 # Run Dockerfile
