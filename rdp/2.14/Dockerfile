@@ -18,13 +18,14 @@ LABEL maintainer="Taylor K. Paisie"
 RUN apt-get update && apt-get install -y \
     default-jre \
     wget \
+    curl \
     zip \
   && rm -rf /var/lib/apt/lists/*
 
 # Install RDP
 ENV rdp_zip rdp_classifier_2.14.zip
 ENV rdp_version 2.14
-ENV rdp_download https://sourceforge.net/projects/rdp-classifier/files/rdp-classifier/$rdp_zip/download
+ENV rdp_download https://sourceforge.net/projects/rdp-classifier/files/rdp-classifier/rdp_classifier_2.14.zip/download
 ENV rdp_path /opt/rdp_classifier
 RUN wget $rdp_download -O /tmp/$rdp_zip \
   && unzip /tmp/$rdp_zip -d /tmp \
@@ -33,11 +34,11 @@ RUN wget $rdp_download -O /tmp/$rdp_zip \
 
 
 # Run Dockerfile
-FROM ubuntu:focal as app
+# FROM ubuntu:focal as app
 
-COPY --from=builder /usr/ /usr/
+# COPY --from=builder /usr/ /usr/
 
-RUN mkdir data/
-WORKDIR /data
+# RUN mkdir data/
+# WORKDIR /data
 
 # Run Dockerfile
