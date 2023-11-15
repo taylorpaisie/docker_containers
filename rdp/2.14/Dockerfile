@@ -18,11 +18,14 @@ LABEL maintainer.email='tpaisie91@gmail.com'
 # Use an official OpenJDK runtime as a parent image
 # Install dependencies
 RUN apt-get update && apt-get install -y \
-    default-jre \
+    openjdk-11-jre \
     wget \
     curl \
     unzip \
     ca-certificates
+
+ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
+ENV PATH="${PATH}:${JAVA_HOME}/bin"
 
 # Install RDP
 ENV RDP_ZIP rdp_classifier_2.14.zip
@@ -33,21 +36,37 @@ RUN wget $RDP_DOWNLOAD -O /tmp/$RDP_ZIP \
   && unzip /tmp/$RDP_ZIP -d /tmp \
   && mv /tmp/${RDP_ZIP%.*} $RDP_PATH \
   && rm -rf /tmp/$RDP_ZIP \
-  && chmod +x ${RDP_PATH}/dist/classifier.jar
+  && chmod +x ${RDP_PATH}/dist/classifier.jar \
+  && ln -s ${RDP_PATH}/dist/classifier.jar /classifier.jar
 
+ENV PATH="${PATH}:/"
 
-# Create a symbolic link to classifier.jar in a directory that's in the PATH
-RUN ln -s ${RDP_PATH}/dist/classifier.jar ./classifier.jar
-
-# Set the environment
-ENV LC_ALL=C.UTF-8
-
-# set the working directory
-# RUN mkdir app
-# WORKDIR /app
+# ENV PATH="${PATH}:/${RDP_PATH}/classifier"
 
 # Run classifier.jar when the container launches
-ENTRYPOINT ["java", "-jar", "classifier.jar", "classify"]
+# ENTRYPOINT ["java", "-jar", "/classifier.jar", "classify", "-o test.txt", "rdp_classifier_2.14/data/ref_seqs.fa}"]
+
+# set the working directory
+# FROM ubuntu:focal as app
+# ARG RDP_VER
+
+# COPY --from=builder /classifier/ /classifier/
+# COPY --from=builder /usr/local/ /usr/local/
+# COPY --from=builder /usr/ /usr/
+
+# Run classifier when the container launches
+# ENTRYPOINT ["/classifier"]
+# RUN /classifier
+
+# set the working directory
+# RUN mkdir data
+# WORKDIR /data
+
+# Create a symbolic link to classifier.jar in a directory that's in the PATH
+# RUN ln -s ${RDP_PATH}/dist/classifier.jar /data/classifier.jar
+
+# Run classifier.jar when the container launches
+# ENTRYPOINT ["java", "-jar", "classifier.jar", "classify"]
 
 
 
