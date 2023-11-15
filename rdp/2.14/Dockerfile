@@ -15,7 +15,6 @@ LABEL license.url="https://github.com/rdpstaff/classifier/blob/master/LICENSE"
 LABEL maintainer="Taylor K. Paisie"
 LABEL maintainer.email='tpaisie91@gmail.com'
 
-# Use an official OpenJDK runtime as a parent image
 # Install dependencies
 RUN apt-get update && apt-get install -y \
     openjdk-11-jre \
@@ -40,7 +39,6 @@ RUN wget $RDP_DOWNLOAD -O /tmp/$RDP_ZIP &&\
   echo "#!/bin/bash" >> /${RDP_PATH}/dist/classifier &&\
   echo "exec java -jar /${RDP_PATH}/dist/classifier.jar """"$""@"""" " >> /${RDP_PATH}/dist/classifier &&\
   chmod +x /${RDP_PATH}/dist/classifier
-  # && ln -s ${RDP_PATH}/dist/classifier.jar /classifier.jar
 
 ENV PATH="${PATH}:/${RDP_PATH}/dist/"
 
