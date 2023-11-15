@@ -41,33 +41,6 @@ RUN wget $RDP_DOWNLOAD -O /tmp/$RDP_ZIP \
 
 ENV PATH="${PATH}:/"
 
-# ENV PATH="${PATH}:/${RDP_PATH}/classifier"
-
-# Run classifier.jar when the container launches
-# ENTRYPOINT ["java", "-jar", "/classifier.jar", "classify", "-o test.txt", "rdp_classifier_2.14/data/ref_seqs.fa}"]
-
-# set the working directory
-# FROM ubuntu:focal as app
-# ARG RDP_VER
-
-# COPY --from=builder /classifier/ /classifier/
-# COPY --from=builder /usr/local/ /usr/local/
-# COPY --from=builder /usr/ /usr/
-
-# Run classifier when the container launches
-# ENTRYPOINT ["/classifier"]
-# RUN /classifier
-
-# set the working directory
-# RUN mkdir data
-# WORKDIR /data
-
-# Create a symbolic link to classifier.jar in a directory that's in the PATH
-# RUN ln -s ${RDP_PATH}/dist/classifier.jar /data/classifier.jar
-
-# Run classifier.jar when the container launches
-# ENTRYPOINT ["java", "-jar", "classifier.jar", "classify"]
-
 
 
 
