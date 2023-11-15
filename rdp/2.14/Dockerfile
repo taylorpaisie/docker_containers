@@ -39,7 +39,7 @@ RUN wget $RDP_DOWNLOAD -O /tmp/$RDP_ZIP \
   && chmod +x ${RDP_PATH}/dist/classifier.jar \
   && ln -s ${RDP_PATH}/dist/classifier.jar /classifier.jar
 
-ENV PATH="${PATH}:/"
+# ENV PATH="${PATH}:/"
 
 
 
