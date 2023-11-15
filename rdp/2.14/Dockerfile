@@ -44,3 +44,7 @@ RUN wget $RDP_DOWNLOAD -O /tmp/$RDP_ZIP &&\
 
 ENV PATH="${PATH}:/${RDP_PATH}/dist/"
 
+# create /data directory and set as working directory
+RUN mkdir /data
+WORKDIR /data
+
