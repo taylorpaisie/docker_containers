@@ -15,40 +15,42 @@ LABEL license.url="https://github.com/rdpstaff/classifier/blob/master/LICENSE"
 LABEL maintainer="Taylor K. Paisie"
 LABEL maintainer.email='tpaisie91@gmail.com'
 
+# Use an official OpenJDK runtime as a parent image
 # Install dependencies
 RUN apt-get update && apt-get install -y \
     default-jre \
     wget \
     curl \
-    unzip 
+    unzip \
+    ca-certificates
 
 # Install RDP
 ENV RDP_ZIP rdp_classifier_2.14.zip
 ENV RDP_DOWNLOAD https://sourceforge.net/projects/rdp-classifier/files/rdp-classifier/rdp_classifier_2.14.zip/download
-ENV RDP_PATH /rdp_classifier
+ENV RDP_PATH /rdp_classifier_2.14
 
 RUN wget $RDP_DOWNLOAD -O /tmp/$RDP_ZIP \
   && unzip /tmp/$RDP_ZIP -d /tmp \
   && mv /tmp/${RDP_ZIP%.*} $RDP_PATH \
-  && rm -rf /tmp/$RDP_ZIP 
-  # && chmod +x /${RDP_PATH}/dist/classifier.jar
+  && rm -rf /tmp/$RDP_ZIP \
+  && chmod +x ${RDP_PATH}/dist/classifier.jar
 
-# need to get this to work in the working directory
-# ENV PATH="${PATH}:/Trimmomatic-${TRIMMOMATIC_VER}/"
-ENV PATH="${PATH}:/${RDP_PATH}/dist/"
-# ENV JAVA_HOME=/usr/bin/java
-# ENV PATH="${RDP_PATH}/dist/"
 
-# ENV PATH="${PATH}:/Trimmomatic-${TRIMMOMATIC_VER}/"
+# Create a symbolic link to classifier.jar in a directory that's in the PATH
+RUN ln -s ${RDP_PATH}/dist/classifier.jar ./classifier.jar
 
-# Run Dockerfile
-FROM ubuntu:focal as app
+# Set the environment
+ENV LC_ALL=C.UTF-8
 
-COPY --from=builder /usr/ /usr/
-# create /data directory and set as working directory
-RUN mkdir /data
-WORKDIR /data
+# set the working directory
+# RUN mkdir app
+# WORKDIR /app
 
-# FROM app as test
-# ARG TRIMMOMATIC_VER
+# Run classifier.jar when the container launches
+ENTRYPOINT ["java", "-jar", "classifier.jar", "classify"]
+
+
+
+
+
 
