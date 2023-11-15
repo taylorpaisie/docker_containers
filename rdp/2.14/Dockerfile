@@ -32,17 +32,15 @@ ENV RDP_ZIP rdp_classifier_2.14.zip
 ENV RDP_DOWNLOAD https://sourceforge.net/projects/rdp-classifier/files/rdp-classifier/rdp_classifier_2.14.zip/download
 ENV RDP_PATH /rdp_classifier_2.14
 
-RUN wget $RDP_DOWNLOAD -O /tmp/$RDP_ZIP \
-  && unzip /tmp/$RDP_ZIP -d /tmp \
-  && mv /tmp/${RDP_ZIP%.*} $RDP_PATH \
-  && rm -rf /tmp/$RDP_ZIP \
-  && chmod +x ${RDP_PATH}/dist/classifier.jar \
-  && ln -s ${RDP_PATH}/dist/classifier.jar /classifier.jar
+RUN wget $RDP_DOWNLOAD -O /tmp/$RDP_ZIP &&\
+  unzip /tmp/$RDP_ZIP -d /tmp &&\
+  mv /tmp/${RDP_ZIP%.*} $RDP_PATH &&\
+  rm -rf /tmp/$RDP_ZIP &&\
+  chmod +x ${RDP_PATH}/dist/classifier.jar &&\
+  echo "#!/bin/bash" >> /${RDP_PATH}/dist/classifier &&\
+  echo "exec java -jar /${RDP_PATH}/dist/classifier.jar """"$""@"""" " >> /${RDP_PATH}/dist/classifier &&\
+  chmod +x /${RDP_PATH}/dist/classifier
+  # && ln -s ${RDP_PATH}/dist/classifier.jar /classifier.jar
 
-# ENV PATH="${PATH}:/"
-
-
-
-
-
+ENV PATH="${PATH}:/${RDP_PATH}/dist/"
 

@@ -18,8 +18,8 @@ wget https://raw.githubusercontent.com/taylorpaisie/docker_containers/main/rdp/2
 
 Use RDP Classifier to get taxonomic assignments for bacterial and archaeal 16S rRNA sequences:
 ```
-java -jar classifier.jar classify -o taxa_16S_test.txt 16S_test.fa
-java -jar classifier.jar classify -o taxa_18S_test.txt 18S_test.fa
+classifier classify -o taxa_16S_test.txt 16S_test.fa
+classifier classify -o taxa_18S_test.txt 18S_test.fa
 ```
 
 ## Output
