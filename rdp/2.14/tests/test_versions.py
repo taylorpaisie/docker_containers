@@ -2,7 +2,6 @@ import unittest
 import subprocess
 import sys
 import re
-import platform
 
 
 class TestVersion(unittest.TestCase):
@@ -18,28 +17,14 @@ class TestVersion(unittest.TestCase):
             self.assertEqual(version, "v2.14")
 
     def get_classifier_version(self):
-        if platform.system() == "Windows":
-            command = "wmic datafile where name='C:\\\\Path\\\\To\\\\classifier.exe' get Version /value"
-            try:
-                result = subprocess.check_output(command, stderr=subprocess.STDOUT, text=True)
-                version_match = re.search(r"Version=(\S+)", result)
-                return version_match.group(1) if version_match else None
-            except subprocess.CalledProcessError as e:
-                print(f"Error executing command: {command}")
-                print(f"Output:\n{e.output.strip()}")
-                return None
-        elif platform.system() == "Linux" or platform.system() == "Darwin":
-            command = "file /../rdp_classifier2.14/dist/classifier | awk '{print $5}'"
-            try:
-                result = subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT, text=True)
-                version_match = re.search(r"v(\S+)", result)
-                return version_match.group(1) if version_match else None
-            except subprocess.CalledProcessError as e:
-                print(f"Error executing command: {command}")
-                print(f"Output:\n{e.output.strip()}")
-                return None
-        else:
-            raise NotImplementedError(f"Unsupported platform: {platform.system()}")
+        try:
+            result = subprocess.check_output(["classifier.jar", "version"], stderr=subprocess.STDOUT, text=True)
+            version_match = re.search(r"v(\S+)", result)
+            return version_match.group(1) if version_match else None
+        except subprocess.CalledProcessError as e:
+            print(f"Error executing command: {e.cmd}")
+            print(f"Output:\n{e.output.strip()}")
+            return None
 
     def test_python(self):
         version = f"{sys.version_info.major}.{sys.version_info.minor}"
