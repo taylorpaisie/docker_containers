@@ -13,15 +13,16 @@ LABEL description="The RDP Classifier is a naive Bayesian classifier which was d
 LABEL website="https://sourceforge.net/projects/rdp-classifier/"
 LABEL license.url="https://github.com/rdpstaff/classifier/blob/master/LICENSE"
 LABEL maintainer="Taylor K. Paisie"
-LABEL maintainer.email='tpaisie91@gmail.com'
+LABEL maintainer.email='ltj8@cdc.gov'
+
+ENV DEBIAN_FRONTEND=noninteractive 
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
     openjdk-11-jre \
     wget \
     curl \
-    unzip \
-    ca-certificates
+    unzip 
 
 ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
 ENV PATH="${PATH}:${JAVA_HOME}/bin"
@@ -42,8 +43,7 @@ RUN wget $RDP_DOWNLOAD -O /tmp/$RDP_ZIP &&\
 
 ENV PATH="${PATH}:/${RDP_PATH}/dist/"
 
-# create /data directory and set as working directory
-RUN mkdir /data
+RUN mkdir data/
 WORKDIR /data
 
 

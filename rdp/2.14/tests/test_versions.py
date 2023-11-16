@@ -3,7 +3,7 @@ import subprocess
 
 
 class TestVersion(unittest.TestCase):
-    def test_pilon(self):
+    def test_rdp(self):
         command = "classifier --version"
         process = subprocess.Popen(
             command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE

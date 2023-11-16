@@ -9,8 +9,8 @@ and can be accessed at [docker hub](https://hub.docker.com/u/tpaisie).
 Get test data:
 ```
 # Download test data
-wget https://raw.githubusercontent.com/taylorpaisie/docker_containers/main/rdp/2.14/16S_rRNA_gene.Burkholderia_pseudomallei.2002721184.AY305776.1.fasta -O 16S_test.fa
-wget https://raw.githubusercontent.com/taylorpaisie/docker_containers/main/rdp/2.14/18S_rRNA_gene.Homo_sapiens.T2T-CHM13v2.0.Chromosome13.fasta -O 18S_test.fa
+wget -nv https://raw.githubusercontent.com/taylorpaisie/docker_containers/main/rdp/2.14/16S_rRNA_gene.Burkholderia_pseudomallei.2002721184.AY305776.1.fasta -O 16S_test.fa
+wget -nv https://raw.githubusercontent.com/taylorpaisie/docker_containers/main/rdp/2.14/18S_rRNA_gene.Homo_sapiens.T2T-CHM13v2.0.Chromosome13.fasta -O 18S_test.fa
 ```
 
 Use RDP Classifier to get taxonomic assignments for bacterial and archaeal 16S rRNA sequences:
