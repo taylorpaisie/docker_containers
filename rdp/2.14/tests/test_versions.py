@@ -22,7 +22,7 @@ class TestVersion(unittest.TestCase):
             version_match = re.search(r"Version=(\S+)", result)
             return version_match.group(1) if version_match else None
         elif platform.system() == "Linux" or platform.system() == "Darwin":
-            command = "file /path/to/classifier | awk '{print $5}'"
+            command = "file /rdp_classifier2.14/dist/classifier | awk '{print $5}'"
             result = subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT, text=True)
             # Extract version information from the result using regex or string manipulation
             version_match = re.search(r"v(\S+)", result)
