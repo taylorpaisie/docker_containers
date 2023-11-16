@@ -11,7 +11,7 @@ class TestControls(unittest.TestCase):
 
 
     def test_rdp16S(self):
-        with open("data/16S_checksum.txt") as f:
+        with open("16S_checksum.txt") as f:
             rdp_checksum = f.readlines()[0].split(" ")[0]
         self.assertEqual(
             rdp_checksum,
@@ -19,7 +19,7 @@ class TestControls(unittest.TestCase):
         )
 
     def test_rdp18S(self):
-        with open("data/18S_checksum.txt") as f:
+        with open("18S_checksum.txt") as f:
             rdp_checksum = f.readlines()[0].split(" ")[0]
         self.assertEqual(
             rdp_checksum,

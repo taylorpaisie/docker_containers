@@ -43,7 +43,32 @@ RUN wget $RDP_DOWNLOAD -O /tmp/$RDP_ZIP &&\
 
 ENV PATH="${PATH}:/${RDP_PATH}/dist/"
 
+
+# Running the dockerfile and tests
+FROM ubuntu:focal as app
+ARG RDP_VER
+
+COPY --from=builder /rdp_classifier_2.14/ /rdp_classifier_2.14/
+COPY --from=builder /usr/local/ /usr/local/
+COPY --from=builder /usr/ /usr/
+
+ENV RDP_PATH /rdp_classifier_2.14
+ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
+ENV PATH="${PATH}:${JAVA_HOME}/bin"
+ENV PATH="${PATH}:/${RDP_PATH}/dist"
+
 RUN mkdir data/
 WORKDIR /data
+
+# Running RDP on test controls
+FROM app as test
+
+RUN apt-get update && apt-get install -y \
+    python3 \
+    wget
+
+RUN mkdir ../tests/
+COPY tests/ ../tests/
+RUN python3 -m unittest discover -v -s ../tests
 
 
