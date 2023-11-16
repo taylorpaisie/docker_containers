@@ -9,7 +9,7 @@ class TestVersion(unittest.TestCase):
             command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
         out, err = process.communicate()
-        self.assertEqual(out, b"RDP version 2.14\n")
+        self.assertEqual(out, b"RDP version 2.14")
 
 
 if __name__ == "__main__":
