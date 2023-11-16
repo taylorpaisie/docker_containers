@@ -1,23 +1,21 @@
 import unittest
 import subprocess
+import sys
 
 
 class TestVersion(unittest.TestCase):
     def test_rdp(self):
-        command = "classifier --version 2>&1 | awk '{print $4}'"
-        process = subprocess.Popen(
-            command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
-        out, err = process.communicate()
-        self.assertEqual(out, "v2.14\n")
+        try:
+            result = subprocess.check_output(["classifier", "--version"], stderr=subprocess.STDOUT, text=True)
+            version = result.strip()
+        except subprocess.CalledProcessError as e:
+            version = e.output.strip()
+
+        self.assertEqual(version, "v2.14")
 
     def test_python(self):
-        command = "python --version 3>&1 | awk '{print $2}'"
-        process = subprocess.Popen(
-            command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
-        out, err = process.communicate()
-        self.assertEqual(out, "3\n")
+        version = f"{sys.version_info.major}.{sys.version_info.minor}"
+        self.assertEqual(version, "3")  # Update this with the expected Python version
 
 
 if __name__ == "__main__":
