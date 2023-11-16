@@ -6,7 +6,7 @@ import sys
 class TestVersion(unittest.TestCase):
     def test_rdp(self):
         try:
-            result = subprocess.check_output(["classifier", "--version"], stderr=subprocess.STDOUT, text=True)
+            result = subprocess.check_output(["classifier", "classify"], stderr=subprocess.STDOUT, text=True)
             version = result.strip()
         except subprocess.CalledProcessError as e:
             version = e.output.strip()
