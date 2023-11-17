@@ -22,9 +22,7 @@ classifier classify -o taxa_18S_test.txt 18S_test.fa
 ## Output
 ```
 head -2 taxa_16S_test.txt
-head -2 taxa_18S_test.txt
-```
-```
+
 AY305776.1		Root	rootrank	1.0	Bacteria	domain	1.0	Pseudomonadota	phylum	1.0	Betaproteobacteria	class	1.0	Burkholderiales	order	1.0	Burkholderiaceae	family	1.0	Burkholderia	genus	1.0
 ```
 
