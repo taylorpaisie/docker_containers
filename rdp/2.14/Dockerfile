@@ -6,7 +6,7 @@ FROM ubuntu:focal as builder
 ARG RDP_VER
 
 LABEL base.image="ubuntu:focal"
-LABEL dockerfile.version="2.14"
+LABEL dockerfile.version="1"
 LABEL software="RDP Classifier"
 LABEL software.version=${RDP_VER}
 LABEL description="The RDP Classifier is a naive Bayesian classifier which was developed to provide rapid taxonomic placement based on rRNA sequence data."
@@ -70,5 +70,3 @@ RUN apt-get update && apt-get install -y \
 RUN mkdir ../tests/
 COPY tests/ ../tests/
 RUN python3 -m unittest discover -v -s ../tests
-
-
