@@ -32,30 +32,33 @@ RUN apt-get update && apt-get install -y \
     ca-certificates
 
 # Install Python dependencies
-# RUN pip3 install \
-#   pytest \
-#   pytest-cov \
-#   biopython==1.78 \
-#   multiprocess==0.70.11 \
-#   scipy==1.6.0 \
-#   numpy==1.19.5 \
-#   dendropy==4.5.1
+RUN pip3 install \
+  pytest \
+  pytest-cov \
+  biopython==1.78 \
+  multiprocess==0.70.11 \
+  scipy==1.6.0 \
+  numpy==1.19.5 \
+  dendropy==4.5.1
+
+RUN apt-get update && apt-get install -y \
+  gubbins
 
 # install Gubbins from github; make /data
-RUN git clone https://github.com/nickjcroucher/gubbins.git && \
-  cd gubbins &&\
-  autoreconf -i &&\
-  chmod +x configure &&\
-  ./configure &&\
-  make
+# RUN git clone https://github.com/nickjcroucher/gubbins.git && \
+#   cd gubbins &&\
+#   autoreconf -i &&\
+#   chmod +x configure &&\
+#   ./configure &&\
+#   make &&\
 #   sudo make install &&\
 #   cd python &&\
 #   python3 -m pip install . &&\
 #   mkdir /data
 
 # set PATH and locale settings for singularity
-# ENV LC_ALL=C.UTF-8 \
-#     PATH="${PATH}:/gubbins/bin"
+ENV LC_ALL=C.UTF-8 \
+    PATH="${PATH}:/gubbins/bin"
 
 WORKDIR /data
 
