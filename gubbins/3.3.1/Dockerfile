@@ -1,6 +1,9 @@
-FROM ubuntu:focal as app
-
+# set global variables
 ARG GUBBINS_VER="3.3.1"
+
+# build Dockerfile
+FROM ubuntu:focal as builder
+ARG GUBBINS_VER
 
 LABEL base.image="ubuntu:focal"
 LABEL dockerfile.version="1"
