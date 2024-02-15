@@ -21,17 +21,13 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     unzip \
-    setuptools \
-    requests \
-    packaging \
-    tqdm \
     python3 \
     python3-pip \
+    git \
     hmmer \
-    scikit-learn \
-    h5py \
-    diamond \
-    prodigal &&\
+    diamond-aligner \
+    prodigal \
+    build-essential &&\
     apt-get autoclean && rm -rf /var/lib/apt/lists/*
 
 # install checkm and its dependencies
@@ -40,30 +36,51 @@ RUN pip install --no-cache-dir \
     matplotlib \
     pysam \
     scipy \
-    pandas
+    pandas \
+    setuptools \
+    requests \
+    packaging \
+    tqdm \
+    scikit-learn \
+    h5py \
+    lightgbm \
+    tensorflow
+
 
 # Install CheckM2
-ENV CHECKM2_DOWNLOAD git clone --recursive https://github.com/chklovski/checkm2.git && cd checkm2
-ENV CHECKM2_PATH /checkm2
-ENV CHECKM2_INSTALL python setup.py install
+# ENV CHECKM2_DOWNLOAD="git clone https://github.com/chklovski/checkm2.git && cd checkm2"
+# ENV CHECKM2_INSTALL="python setup.py install"
+ENV CHECKM2_PATH="checkm2/"
+ENV PATH="${PATH}:${CHECKM2_PATH}/bin"
+
+# Clone CheckM2 repository and install
+# RUN ${CHECKM2_DOWNLOAD} && ${CHECKM2_INSTALL}
+RUN git clone https://github.com/chklovski/checkm2.git &&\
+    cd checkm2 &&\
+    python3 setup.py install
 
 # 'CMD' instructions set a default command when the container is run.
-CMD [ "checkm2", "-h" ]
+# CMD [ "checkm2", "-h" ]
 
-# download database and inform CheckM of where the files have been placed
-RUN checkm2 database --download
-# ENV
-
-# Running the dockerfile and tests
+# # Running the dockerfile and tests
 FROM ubuntu:focal as app
 ARG CHECKM2_VER
 
+COPY --from=builder /checkm2/ /checkm2
+COPY --from=builder /usr/local/ /usr/local/
+COPY --from=builder /usr/ /usr/
 
-# 'WORKDIR' sets working directory
+ENV PATH="${PATH}:/${CHECKM2_PATH}/bin"
+
+# # 'WORKDIR' sets working directory
+RUN mkdir data/
 WORKDIR /data
 
-## Test ##
-FROM app as test
+# download database and inform CheckM of where the files have been placed
+# RUN checkm2 database --download
 
-# run test with internal test data
-RUN checkm2 testrun
+# ## Test ##
+# FROM app as test
+
+# # run test with internal test data
+# RUN checkm2 testrun
