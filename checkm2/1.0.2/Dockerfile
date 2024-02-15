@@ -26,12 +26,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     packaging \
     tqdm \
     python3 \
+    python3-pip \
     hmmer \
     scikit-learn \
     h5py \
     diamond \
-    pandas \
-    scipy \
     prodigal &&\
     apt-get autoclean && rm -rf /var/lib/apt/lists/*
 
@@ -39,7 +38,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN pip install --no-cache-dir \
     numpy \
     matplotlib \
-    pysam
+    pysam \
+    scipy \
+    pandas
 
 # Install CheckM2
 ENV CHECKM2_DOWNLOAD git clone --recursive https://github.com/chklovski/checkm2.git && cd checkm2
