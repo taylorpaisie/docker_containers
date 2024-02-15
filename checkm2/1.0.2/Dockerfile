@@ -74,6 +74,7 @@ ENV PATH="${PATH}:/${CHECKM2_PATH}/bin"
 
 # # 'WORKDIR' sets working directory
 RUN mkdir data/
+RUN mkdir test_output/
 WORKDIR /data
 
 # download database and inform CheckM of where the files have been placed
@@ -85,12 +86,12 @@ RUN for i in 1 2 3; do \
 # ## Test ##
 FROM app as test
 
-# # run test with internal test data
-# RUN checkm2 testrun
-
 RUN apt-get update && apt-get install -y \
     python3 \
     wget
+
+# # run test with internal test data
+RUN checkm2 testrun
 
 RUN mkdir ../tests/
 COPY tests/ ../tests/
