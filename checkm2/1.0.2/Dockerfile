@@ -83,7 +83,16 @@ RUN for i in 1 2 3; do \
 
 
 # ## Test ##
-# FROM app as test
+FROM app as test
 
 # # run test with internal test data
 # RUN checkm2 testrun
+
+RUN apt-get update && apt-get install -y \
+    python3 \
+    wget
+
+RUN mkdir ../tests/
+COPY tests/ ../tests/
+# RUN python3 -m unittest discover -v -s ../tests
+
