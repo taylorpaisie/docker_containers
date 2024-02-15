@@ -29,16 +29,35 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     hmmer \
     scikit-learn \
     h5py \
-    numpy \
     diamond \
     pandas \
     scipy \
     prodigal &&\
     apt-get autoclean && rm -rf /var/lib/apt/lists/*
 
+# install checkm and its dependencies
+RUN pip install --no-cache-dir \
+    numpy \
+    matplotlib \
+    pysam
 
+# Install CheckM2
+ENV CHECKM2_DOWNLOAD git clone --recursive https://github.com/chklovski/checkm2.git && cd checkm2
+ENV CHECKM2_PATH /checkm2
+ENV CHECKM2_INSTALL python setup.py install
 
+# 'CMD' instructions set a default command when the container is run.
+CMD [ "checkm2", "-h" ]
 
+# download database and inform CheckM of where the files have been placed
+RUN checkm2 database --download
+# ENV
 
-# ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
-# ENV PATH="${PATH}:${JAVA_HOME}/bin"
+# 'WORKDIR' sets working directory
+WORKDIR /data
+
+## Test ##
+FROM app as test
+
+# run test with internal test data
+RUN checkm2 testrun
