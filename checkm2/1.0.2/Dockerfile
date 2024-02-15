@@ -53,6 +53,11 @@ CMD [ "checkm2", "-h" ]
 RUN checkm2 database --download
 # ENV
 
+# Running the dockerfile and tests
+FROM ubuntu:focal as app
+ARG CHECKM2_VER
+
+
 # 'WORKDIR' sets working directory
 WORKDIR /data
 
