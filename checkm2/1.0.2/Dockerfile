@@ -18,12 +18,27 @@ LABEL maintainer.email='ltj8@cdc.gov'
 ENV DEBIAN_FRONTEND=noninteractive 
 
 # Install dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     unzip \
-    python3
-    curl \
-    unzip 
+    setuptools \
+    requests \
+    packaging \
+    tqdm \
+    python3 \
+    hmmer \
+    scikit-learn \
+    h5py \
+    numpy \
+    diamond \
+    pandas \
+    scipy \
+    prodigal &&\
+    apt-get autoclean && rm -rf /var/lib/apt/lists/*
 
-ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
-ENV PATH="${PATH}:${JAVA_HOME}/bin"
+
+
+
+
+# ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
+# ENV PATH="${PATH}:${JAVA_HOME}/bin"
