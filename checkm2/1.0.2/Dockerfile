@@ -77,7 +77,10 @@ RUN mkdir data/
 WORKDIR /data
 
 # download database and inform CheckM of where the files have been placed
-# RUN checkm2 database --download
+RUN for i in 1 2 3; do \
+        checkm2 database --download && break || sleep 15; \
+    done
+
 
 # ## Test ##
 # FROM app as test
