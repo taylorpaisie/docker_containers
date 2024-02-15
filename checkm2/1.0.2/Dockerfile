@@ -1,17 +1,17 @@
 # set global variables
-ARG CHECKM2_VER="2.14"
+ARG CHECKM2_VER="1.0.2"
 
 # build Dockerfile
 FROM ubuntu:focal as builder
-ARG RDP_VER
+ARG CHECKM2_VER
 
 LABEL base.image="ubuntu:focal"
 LABEL dockerfile.version="1"
 LABEL software="CheckM2"
-LABEL software.version=${RDP_VER}
-LABEL description="The RDP Classifier is a naive Bayesian classifier which was developed to provide rapid taxonomic placement based on rRNA sequence data."
-LABEL website="https://sourceforge.net/projects/rdp-classifier/"
-LABEL license.url="https://github.com/rdpstaff/classifier/blob/master/LICENSE"
+LABEL software.version=${CHECKM2_VER}
+LABEL description="Rapid assessment of genome bin quality using machine learning."
+LABEL website="https://github.com/chklovski/CheckM2"
+LABEL license.url="https://github.com/chklovski/CheckM2/blob/main/LICENSE"
 LABEL maintainer="Taylor K. Paisie"
 LABEL maintainer.email='ltj8@cdc.gov'
 
@@ -19,8 +19,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
-    openjdk-11-jre \
     wget \
+    unzip \
+    python3
     curl \
     unzip 
 
