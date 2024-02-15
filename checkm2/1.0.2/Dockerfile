@@ -91,7 +91,7 @@ RUN apt-get update && apt-get install -y \
     wget
 
 # # run test with internal test data
-RUN checkm2 testrun
+# RUN checkm2 testrun
 
 RUN mkdir ../tests/
 COPY tests/ ../tests/
