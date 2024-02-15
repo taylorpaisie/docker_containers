@@ -78,11 +78,15 @@ RUN mkdir test_output/
 WORKDIR /data
 
 # download database and inform CheckM of where the files have been placed
-RUN mkdir db/ && cd db/
-RUN for i in 1 2 3; do \
+# Assuming CheckM2 automatically recognizes the db directory if it's in a specific location
+# If not, you might need to set an environment variable or use a CheckM2 command to specify the db path
+RUN mkdir /data/db/ && \
+    cd /data/db/ && \
+    for i in 1 2 3; do \
         checkm2 database --download && break || sleep 15; \
     done
-RUN cd ../
+
+ENV CHECKM2_DB_PATH="/data/db/"
 
 # ## Test ##
 FROM app as test
@@ -90,6 +94,9 @@ FROM app as test
 RUN apt-get update && apt-get install -y \
     python3 \
     wget
+
+ENV PATH="${PATH}:/${CHECKM2_PATH}/bin"
+ENV CHECKM2_DB_PATH="/data/db/"
 
 # # run test with internal test data
 # RUN checkm2 testrun
