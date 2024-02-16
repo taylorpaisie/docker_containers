@@ -9,7 +9,7 @@ wget -nv https://raw.githubusercontent.com/taylorpaisie/docker_containers/main/c
 checkm2 predict --input burk_wgs_pos_ctrl.fa \
     burk_16S_neg_ctrl.fa \
     neg_ctrl.fa \
-    --output-directory tests_output/
+    --output-directory data/tests_output/
 
 # run checksum on files
 sha256sum burk_wgs_pos_ctrl.fa > burk_wgs_checksum.txt
