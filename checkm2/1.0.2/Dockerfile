@@ -47,17 +47,15 @@ RUN pip install --no-cache-dir \
     lightgbm \
     tensorflow
 
+
 # Clone CheckM2 repository and install
 # RUN ${CHECKM2_DOWNLOAD} && ${CHECKM2_INSTALL}
 RUN git clone https://github.com/chklovski/checkm2.git &&\
     cd checkm2 &&\
     python3 setup.py install
 
-ENV CHECKM2_PATH="checkm2/"
-ENV PATH="${PATH}:${CHECKM2_PATH}/bin"
-
 # 'CMD' instructions set a default command when the container is run.
-# CMD [ "checkm2", "-h" ]
+CMD [ "checkm2", "-h" ]
 
 # # Running the dockerfile and tests
 FROM ubuntu:focal as app
