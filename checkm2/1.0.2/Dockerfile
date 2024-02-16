@@ -107,5 +107,5 @@ RUN mkdir ../tests/
 RUN mkdir data/tests_output/
 COPY tests/ ../tests/
 
-# RUN python3 -m unittest discover -v -s ../tests
+RUN python3 -m unittest discover -v -s ../tests
 
