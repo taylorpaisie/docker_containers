@@ -47,15 +47,11 @@ RUN pip install --no-cache-dir \
     lightgbm \
     tensorflow
 
-
 # Clone CheckM2 repository and install
-# RUN ${CHECKM2_DOWNLOAD} && ${CHECKM2_INSTALL}
 RUN git clone https://github.com/chklovski/checkm2.git &&\
     cd checkm2 &&\
     python3 setup.py install
 
-# 'CMD' instructions set a default command when the container is run.
-CMD [ "checkm2", "-h" ]
 
 # # Running the dockerfile and tests
 FROM ubuntu:focal as app
@@ -69,18 +65,18 @@ ENV PATH="${PATH}:/${CHECKM2_PATH}/bin"
 
 # # 'WORKDIR' sets working directory
 RUN mkdir data/
-RUN mkdir test_output/
 WORKDIR /data
 
 # download database and inform CheckM of where the files have been placed
-RUN mkdir /data/db/ && \
-    cd /data/db/ && \
-    for i in 1 2 3; do \
-        checkm2 database --download && break || sleep 15; \
-    done
-    
+# RUN mkdir /data/db/ && \
+#     cd /data/db/ && \
+#     for i in 1 2 3; do \
+#         checkm2 database --download && break || sleep 15; \
+#     done
 
-ENV CHECKM2_DB_PATH="/data/db/"
+RUN checkm2 database --download
+
+ENV PATH="${PATH}:/root/databases/"
 
 # # run test with internal test data
 # RUN checkm2 testrun
@@ -92,11 +88,8 @@ RUN apt-get update && apt-get install -y \
     python3 \
     wget
 
-ENV PATH="${PATH}:/${CHECKM2_PATH}/bin"
-ENV CHECKM2_DB_PATH="/data/db/"
-
 RUN mkdir ../tests/
 COPY tests/ ../tests/
 
-# RUN python3 -m unittest discover -v -s ../tests
+RUN python3 -m unittest discover -v -s ../tests
 
