@@ -52,8 +52,7 @@ RUN git clone https://github.com/chklovski/checkm2.git &&\
     cd checkm2 &&\
     python3 setup.py install
 
-
-# # Running the dockerfile and tests
+# Running the dockerfile and tests
 FROM ubuntu:focal as app
 ARG CHECKM2_VER
 
@@ -63,25 +62,19 @@ COPY --from=builder /usr/ /usr/
 
 ENV PATH="${PATH}:/${CHECKM2_PATH}/bin"
 
-# # 'WORKDIR' sets working directory
+# Setting working directory
 RUN mkdir data/
 WORKDIR /data
 
-# download database and inform CheckM of where the files have been placed
-# RUN mkdir /data/db/ && \
-#     cd /data/db/ && \
-#     for i in 1 2 3; do \
-#         checkm2 database --download && break || sleep 15; \
-#     done
-
+# download database and set db in PATH
 RUN checkm2 database --download
-
 ENV PATH="${PATH}:/root/databases/CheckM2_database/"
 
-# # run test with internal test data
-RUN checkm2 testrun
+# run test with internal test data
+RUN checkm2 testrun --threads 4 \
+    --database_path /root/databases/CheckM2_database/uniref100.KO.1.dmnd
 
-# ## Test ##
+## Test ##
 FROM app as test
 
 RUN apt-get update && apt-get install -y \

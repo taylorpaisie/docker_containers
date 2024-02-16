@@ -5,7 +5,8 @@ wget -nv https://raw.githubusercontent.com/taylorpaisie/docker_containers/main/c
 wget -nv https://raw.githubusercontent.com/taylorpaisie/docker_containers/main/checkm2/1.0.2/burk_16S.fa -O burk_16S_neg_ctrl.fa
 
 # Get taxonomic assignments for your data
-checkm2 predict --input burk_wgs_pos_ctrl.fa \
+checkm2 predict --threads 4 \
+    --input burk_wgs_pos_ctrl.fa \
     burk_16S_neg_ctrl.fa \
     --output-directory tests_output/
 
