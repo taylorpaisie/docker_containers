@@ -88,6 +88,9 @@ RUN mkdir /data/db/ && \
 
 ENV CHECKM2_DB_PATH="/data/db/"
 
+# # run test with internal test data
+# RUN checkm2 testrun
+
 # ## Test ##
 FROM app as test
 
@@ -98,8 +101,7 @@ RUN apt-get update && apt-get install -y \
 ENV PATH="${PATH}:/${CHECKM2_PATH}/bin"
 ENV CHECKM2_DB_PATH="/data/db/"
 
-# # run test with internal test data
-# RUN checkm2 testrun
+
 
 RUN mkdir ../tests/
 COPY tests/ ../tests/
