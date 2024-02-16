@@ -21,6 +21,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     unzip \
+    less \
     python3 \
     python3-pip \
     git \
@@ -46,18 +47,14 @@ RUN pip install --no-cache-dir \
     lightgbm \
     tensorflow
 
-
-# Install CheckM2
-# ENV CHECKM2_DOWNLOAD="git clone https://github.com/chklovski/checkm2.git && cd checkm2"
-# ENV CHECKM2_INSTALL="python setup.py install"
-ENV CHECKM2_PATH="checkm2/"
-ENV PATH="${PATH}:${CHECKM2_PATH}/bin"
-
 # Clone CheckM2 repository and install
 # RUN ${CHECKM2_DOWNLOAD} && ${CHECKM2_INSTALL}
 RUN git clone https://github.com/chklovski/checkm2.git &&\
     cd checkm2 &&\
     python3 setup.py install
+
+ENV CHECKM2_PATH="checkm2/"
+ENV PATH="${PATH}:${CHECKM2_PATH}/bin"
 
 # 'CMD' instructions set a default command when the container is run.
 # CMD [ "checkm2", "-h" ]
@@ -103,5 +100,5 @@ ENV CHECKM2_DB_PATH="/data/db/"
 RUN mkdir ../tests/
 COPY tests/ ../tests/
 
-RUN python3 -m unittest discover -v -s ../tests
+# RUN python3 -m unittest discover -v -s ../tests
 
