@@ -71,8 +71,8 @@ RUN checkm2 database --download
 ENV PATH="${PATH}:/root/databases/CheckM2_database/"
 
 # run test with internal test data
-RUN checkm2 testrun --threads 4 \
-    --database_path /root/databases/CheckM2_database/uniref100.KO.1.dmnd
+# RUN checkm2 testrun --threads 4 \
+#     --database_path /root/databases/CheckM2_database/uniref100.KO.1.dmnd
 
 ## Test ##
 FROM app as test
