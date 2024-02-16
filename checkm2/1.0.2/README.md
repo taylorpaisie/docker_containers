@@ -6,23 +6,27 @@ This image implements:
 and can be accessed at [docker hub](https://hub.docker.com/u/tpaisie).
 
 ## Example analysis
-Get test data:
+Get positive and negative control test data:
 ```
-# Download test data
-wget -nv https://raw.githubusercontent.com/taylorpaisie/docker_containers/main/rdp/2.14/16S_rRNA_gene.Burkholderia_pseudomallei.2002721184.AY305776.1.fasta -O 16S_test.fa
-wget -nv https://raw.githubusercontent.com/taylorpaisie/docker_containers/main/rdp/2.14/18S_rRNA_gene.Homo_sapiens.T2T-CHM13v2.0.Chromosome13.fasta -O 18S_test.fa
+# Download positive and negative control test data
+wget -nv https://raw.githubusercontent.com/taylorpaisie/docker_containers/main/checkm2/1.0.2/burk_wgs.fa -O burk_wgs_pos_ctrl.fa
+wget -nv https://raw.githubusercontent.com/taylorpaisie/docker_containers/main/checkm2/1.0.2/burk_16S.fa -O burk_16S_neg_ctrl.fa
+wget -nv https://raw.githubusercontent.com/taylorpaisie/docker_containers/main/checkm2/1.0.2/neg_control_test.fa -O neg_ctrl.fa
+
 ```
 
-Use RDP Classifier to get taxonomic assignments for bacterial and archaeal 16S rRNA sequences:
+# Running CheckM2 on the test data
 ```
-classifier classify -o taxa_16S_test.txt 16S_test.fa
-classifier classify -o taxa_18S_test.txt 18S_test.fa
+checkm2 predict --input burk_wgs_pos_ctrl.fa \
+    burk_16S_neg_ctrl.fa \
+    neg_ctrl.fa \
+    --output-directory tests_output/
 ```
 
-## Output
+## Run checksum on files
 ```
-head -2 taxa_16S_test.txt
-
-AY305776.1		Root	rootrank	1.0	Bacteria	domain	1.0	Pseudomonadota	phylum	1.0	Betaproteobacteria	class	1.0	Burkholderiales	order	1.0	Burkholderiaceae	family	1.0	Burkholderia	genus	1.0
+sha256sum burk_wgs_pos_ctrl.fa > burk_wgs_checksum.txt
+sha256sum burk_16S_neg_ctrl.fa > burk_16S_checksum.txt
+sha256sum neg_ctrl.fa > neg_ctrl_checksum.txt
 ```
 
