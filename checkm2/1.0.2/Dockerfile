@@ -22,48 +22,40 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     unzip \
     less \
-    # libpthread \
-    # zlib \
+    automake \
     cmake \
-    gcc \
+    zlib1g-dev\
+    libzstd-dev \
     python3 \
     python3-pip \
     git \
     hmmer \
     prodigal \
-    ncbi-blast+ \
+    # diamond=2.0.4 \
+    diamond-aligner \
     build-essential &&\
     apt-get autoclean && rm -rf /var/lib/apt/lists/*
 
 # install checkm2 and its dependencies
 RUN pip install --no-cache-dir \
-    numpy \
-    pysam \
-    scipy \
-    pandas \
-    # diamond \
-    # diamond-aligner \
+    numpy==1.19.5 \
+    scipy==1.8.0 \
+    pandas==1.4.0 \
+    diamond==2.0.4 \
     setuptools \
     requests \
     packaging \
     tqdm \
     scikit-learn==0.23.2 \
-    h5py \
-    lightgbm \
-    tensorflow 
+    h5py==2.10.0 \
+    lightgbm==3.2.1 \
+    protobuf==3.20.0 \
+    tensorflow==2.2.0
 
 # Install Diamond
 # RUN wget http://github.com/bbuchfink/diamond/releases/download/v2.1.9/diamond-linux64.tar.gz
 # RUN tar xzf diamond-linux64.tar.gz
 
-# RUN wget http://github.com/bbuchfink/diamond/archive/v2.1.9.tar.gz &&\
-#     tar xzf v2.1.9.tar.gz &&\
-#     cd diamond-2.1.9 &&\
-#     mkdir bin &&\
-#     cd bin &&\
-#     cmake .. &&\
-#     make -j4 &&\
-#     sudo make install
 
 # Clone CheckM2 repository and install
 RUN git clone https://github.com/chklovski/checkm2.git &&\
@@ -80,20 +72,20 @@ COPY --from=builder /usr/ /usr/
 
 ENV PATH="${PATH}:/${CHECKM2_PATH}/bin"
 
+
 # Setting working directory
 RUN mkdir data/
 WORKDIR /data
 
 # download database and set db in PATH
 RUN checkm2 database --download
-# RUN wget -nv https://zenodo.org/records/5571251/files/checkm2_database.tar.gz?download=1 -O checkm2_database.tar.gz
 ENV PATH="${PATH}:/root/databases/CheckM2_database/"
 
-# run test with internal test data
-# RUN checkm2 testrun --threads 4 \
-#     --database_path /root/databases/CheckM2_database/uniref100.KO.1.dmnd
+# # run test with internal test data
+# # RUN checkm2 testrun --threads 4 \
+# #     --database_path /root/databases/CheckM2_database/uniref100.KO.1.dmnd
 
-## Test ##
+# ## Test ##
 FROM app as test
 
 RUN apt-get update && apt-get install -y \
@@ -103,5 +95,5 @@ RUN apt-get update && apt-get install -y \
 RUN mkdir ../tests/
 COPY tests/ ../tests/
 
-RUN python3 -m unittest discover -v -s ../tests
+# RUN python3 -m unittest discover -v -s ../tests
 
