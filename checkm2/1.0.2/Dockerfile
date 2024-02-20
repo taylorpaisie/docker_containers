@@ -31,8 +31,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     hmmer \
     prodigal \
-    # diamond=2.0.4 \
-    diamond-aligner \
+    diamond-aligner=2.0.14 \
     build-essential &&\
     apt-get autoclean && rm -rf /var/lib/apt/lists/*
 
@@ -41,7 +40,6 @@ RUN pip install --no-cache-dir \
     numpy==1.19.5 \
     scipy==1.8.0 \
     pandas==1.4.0 \
-    diamond==2.0.4 \
     setuptools \
     requests \
     packaging \
