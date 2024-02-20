@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     cmake \
     zlib1g-dev\
     libzstd-dev \
+    g++ \
     python3 \
     python3-pip \
     git \
@@ -50,9 +51,7 @@ RUN pip install --no-cache-dir \
     protobuf==3.20.0 \
     tensorflow==2.2.0
 
-# Install Diamond
-RUN wget http://github.com/bbuchfink/diamond/releases/download/v2.0.4/diamond-linux64.tar.gz
-RUN tar xzf diamond-linux64.tar.gz
+
 
 # Clone CheckM2 repository and install
 RUN git clone https://github.com/chklovski/checkm2.git &&\
@@ -60,16 +59,15 @@ RUN git clone https://github.com/chklovski/checkm2.git &&\
     python3 setup.py install &&\
     cd ..
 
-RUN git clone https://github.com/ncbi/ncbi-cxx-toolkit-public.git
-WORKDIR ncbi-cxx-toolkit-public
-RUN ./cmake-configure --without-debug --with-projects="objtools/blast/seqdb_reader;objtools/blast/blastdb_format" --with-build-root=build --with-features="-SSE"
-WORKDIR build/build
-RUN make -j4
-RUN cp /opt/diamond/ncbi-cxx-toolkit-public/build/inc/ncbiconf_unix.h /opt/diamond/ncbi-cxx-toolkit-public/include
+# Install Diamond
+RUN wget http://github.com/bbuchfink/diamond/archive/v2.0.4.tar.gz
+RUN tar xzf v2.0.4.tar.gz &&\
+    cd diamond-2.0.4 &&\
+    mkdir bin && cd bin &&\
+    cmake .. &&\
+    make -j4 &&\
+    sudo make install
 
-WORKDIR /opt/diamond/build
-RUN cmake -DCMAKE_BUILD_TYPE=Release -DBLAST_INCLUDE_DIR=/opt/diamond/ncbi-cxx-toolkit-public/include -DBLAST_LIBRARY_DIR=/opt/diamond/ncbi-cxx-toolkit-public/build/lib ..
-RUN make -j4 && make install
 
 # Running the dockerfile and tests
 FROM ubuntu:focal as app
