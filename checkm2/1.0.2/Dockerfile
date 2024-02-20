@@ -60,23 +60,23 @@ RUN git clone https://github.com/chklovski/checkm2.git &&\
     cd ..
 
 # Install Diamond
-RUN wget http://github.com/bbuchfink/diamond/archive/v2.0.4.tar.gz
-RUN tar xzf v2.0.4.tar.gz &&\
+RUN wget http://github.com/bbuchfink/diamond/archive/v2.0.4.tar.gz &&\
+    tar xzf v2.0.4.tar.gz &&\
     cd diamond-2.0.4 &&\
     mkdir bin && cd bin &&\
-    cmake .. &&\
+    cmake -DCMAKE_INSTALL_PREFIX=$HOME .. &&\
     make -j4 &&\
-    sudo make install
+    make install
 
 
 # Running the dockerfile and tests
 FROM ubuntu:focal as app
 ARG CHECKM2_VER
 
-COPY --from=builder /checkm2/ /checkm2
+COPY --from=builder /checkm2/ /checkm2/
+COPY --from=builder /diamond-2.0.4/ /diamond-2.0.4/
 COPY --from=builder /usr/local/ /usr/local/
 COPY --from=builder /usr/ /usr/
-COPY --from=builder /usr/local/bin/diamond /usr/local/bin/diamond
 
 ENV PATH="${PATH}:/${CHECKM2_PATH}/bin"
 
