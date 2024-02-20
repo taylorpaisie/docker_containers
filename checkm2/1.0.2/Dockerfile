@@ -31,7 +31,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     hmmer \
     prodigal \
-    diamond-aligner=2.0.14 \
+    # diamond-aligner \
     build-essential &&\
     apt-get autoclean && rm -rf /var/lib/apt/lists/*
 
@@ -51,14 +51,25 @@ RUN pip install --no-cache-dir \
     tensorflow==2.2.0
 
 # Install Diamond
-# RUN wget http://github.com/bbuchfink/diamond/releases/download/v2.1.9/diamond-linux64.tar.gz
-# RUN tar xzf diamond-linux64.tar.gz
-
+RUN wget http://github.com/bbuchfink/diamond/releases/download/v2.0.4/diamond-linux64.tar.gz
+RUN tar xzf diamond-linux64.tar.gz
 
 # Clone CheckM2 repository and install
 RUN git clone https://github.com/chklovski/checkm2.git &&\
     cd checkm2 &&\
-    python3 setup.py install
+    python3 setup.py install &&\
+    cd ..
+
+RUN git clone https://github.com/ncbi/ncbi-cxx-toolkit-public.git
+WORKDIR ncbi-cxx-toolkit-public
+RUN ./cmake-configure --without-debug --with-projects="objtools/blast/seqdb_reader;objtools/blast/blastdb_format" --with-build-root=build --with-features="-SSE"
+WORKDIR build/build
+RUN make -j4
+RUN cp /opt/diamond/ncbi-cxx-toolkit-public/build/inc/ncbiconf_unix.h /opt/diamond/ncbi-cxx-toolkit-public/include
+
+WORKDIR /opt/diamond/build
+RUN cmake -DCMAKE_BUILD_TYPE=Release -DBLAST_INCLUDE_DIR=/opt/diamond/ncbi-cxx-toolkit-public/include -DBLAST_LIBRARY_DIR=/opt/diamond/ncbi-cxx-toolkit-public/build/lib ..
+RUN make -j4 && make install
 
 # Running the dockerfile and tests
 FROM ubuntu:focal as app
@@ -67,6 +78,7 @@ ARG CHECKM2_VER
 COPY --from=builder /checkm2/ /checkm2
 COPY --from=builder /usr/local/ /usr/local/
 COPY --from=builder /usr/ /usr/
+COPY --from=builder /usr/local/bin/diamond /usr/local/bin/diamond
 
 ENV PATH="${PATH}:/${CHECKM2_PATH}/bin"
 
