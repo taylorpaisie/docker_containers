@@ -22,30 +22,48 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     unzip \
     less \
+    # libpthread \
+    # zlib \
+    cmake \
+    gcc \
     python3 \
     python3-pip \
     git \
     hmmer \
-    diamond-aligner \
     prodigal \
+    ncbi-blast+ \
     build-essential &&\
     apt-get autoclean && rm -rf /var/lib/apt/lists/*
 
-# install checkm and its dependencies
+# install checkm2 and its dependencies
 RUN pip install --no-cache-dir \
     numpy \
-    matplotlib \
     pysam \
     scipy \
     pandas \
+    # diamond \
+    # diamond-aligner \
     setuptools \
     requests \
     packaging \
     tqdm \
-    scikit-learn \
+    scikit-learn==0.23.2 \
     h5py \
     lightgbm \
-    tensorflow
+    tensorflow 
+
+# Install Diamond
+# RUN wget http://github.com/bbuchfink/diamond/releases/download/v2.1.9/diamond-linux64.tar.gz
+# RUN tar xzf diamond-linux64.tar.gz
+
+# RUN wget http://github.com/bbuchfink/diamond/archive/v2.1.9.tar.gz &&\
+#     tar xzf v2.1.9.tar.gz &&\
+#     cd diamond-2.1.9 &&\
+#     mkdir bin &&\
+#     cd bin &&\
+#     cmake .. &&\
+#     make -j4 &&\
+#     sudo make install
 
 # Clone CheckM2 repository and install
 RUN git clone https://github.com/chklovski/checkm2.git &&\
@@ -68,6 +86,7 @@ WORKDIR /data
 
 # download database and set db in PATH
 RUN checkm2 database --download
+# RUN wget -nv https://zenodo.org/records/5571251/files/checkm2_database.tar.gz?download=1 -O checkm2_database.tar.gz
 ENV PATH="${PATH}:/root/databases/CheckM2_database/"
 
 # run test with internal test data
