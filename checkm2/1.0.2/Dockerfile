@@ -32,7 +32,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     hmmer \
     prodigal \
-    # diamond-aligner \
     build-essential &&\
     apt-get autoclean && rm -rf /var/lib/apt/lists/*
 
@@ -99,5 +98,5 @@ RUN apt-get update && apt-get install -y \
 RUN mkdir ../tests/
 COPY tests/ ../tests/
 
-# RUN python3 -m unittest discover -v -s ../tests
+RUN python3 -m unittest discover -v -s ../tests
 
