@@ -52,7 +52,6 @@ RUN pip install --no-cache-dir \
     tensorflow==2.2.0
 
 
-
 # Clone CheckM2 repository and install
 RUN git clone https://github.com/chklovski/checkm2.git &&\
     cd checkm2 &&\
@@ -78,8 +77,7 @@ COPY --from=builder /diamond-2.0.4/ /diamond-2.0.4/
 COPY --from=builder /usr/local/ /usr/local/
 COPY --from=builder /usr/ /usr/
 
-ENV PATH="${PATH}:/${CHECKM2_PATH}/bin"
-
+ENV PATH="${PATH}:/diamond-2.0.4/bin/"
 
 # Setting working directory
 RUN mkdir data/
@@ -87,11 +85,9 @@ WORKDIR /data
 
 # download database and set db in PATH
 RUN checkm2 database --download
-ENV PATH="${PATH}:/root/databases/CheckM2_database/"
 
 # # run test with internal test data
-# # RUN checkm2 testrun --threads 4 \
-# #     --database_path /root/databases/CheckM2_database/uniref100.KO.1.dmnd
+RUN checkm2 testrun --threads 4 --debug
 
 # ## Test ##
 FROM app as test
