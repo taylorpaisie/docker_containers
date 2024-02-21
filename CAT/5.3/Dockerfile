@@ -27,22 +27,29 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zlib1g-dev\
     libzstd-dev \
     g++ \
+    # ca-certificates \
     python3 \
     python3-pip \
     git \
-    # hmmer \
     prodigal \
+    ncbi-blast+ \
     build-essential &&\
     apt-get autoclean && rm -rf /var/lib/apt/lists/*
 
-# clone CAT from git repo
-RUN git clone https://github.com/dutilh/CAT.git &&\
-    cd CAT/ &&\
+# install CAT dependencies
+RUN pip install --no-cache-dir \
+    certifi \
+    biopython
+
+# clone CAT from git repo    
+RUN wget https://github.com/dutilh/CAT/archive/refs/tags/v5.3.tar.gz &&\
+    tar xvzf v5.3.tar.gz &&\
+    cd CAT-5.3/ &&\
     chmod +x CAT_pack/CAT &&\
     cd ..
 
-# Add CAT and BAT to PATH
-ENV PATH="/CAT/CAT_pack:${PATH}"
+
+ENV PATH="${PATH}:/CAT/CAT_pack"
 
 # Install Diamond
 RUN wget http://github.com/bbuchfink/diamond/archive/v2.1.9.tar.gz &&\
@@ -53,23 +60,37 @@ RUN wget http://github.com/bbuchfink/diamond/archive/v2.1.9.tar.gz &&\
     make -j4 &&\
     make install
 
+# Install CAT NCBI nr db
+# RUN mkdir /databases/ &&\
+#     CAT download --db nr -o databases/
+
 # Running the dockerfile and tests
 FROM ubuntu:focal as app
 ARG CAT_VER
 
 COPY --from=builder /usr/ /usr/
-
-# Setting working directory
-RUN mkdir data/
-WORKDIR /data
+COPY --from=builder /CAT-5.3/ /CAT/
+COPY --from=builder /diamond-2.1.9/ /diamond/
 
 # setting CAT to PATH
 ENV PATH="${PATH}:/CAT/CAT_pack"
 
-# download database
-# RUN wget --no-check-certificate tbb.bio.uu.nl/tina/CAT_prepare/20231120_CAT_nr.tar.gz &&\
-#     tar -xvzf 20231120_CAT_nr.tar.gz
+# Setting working directory
+RUN mkdir data/ &&\
+    cd data/ &&\
+    mkdir db_tests/
+WORKDIR /data
 
+RUN gzip -d ../CAT/tests/data/prepare/small.fa.gz
+RUN CAT prepare --db_fasta \
+    ../CAT/tests/data/prepare/small.fa \
+    --acc2tax ../CAT/tests/data/prepare/prot2acc.txt \
+    --names ../CAT/tests/data/prepare/names.dmp \
+    --nodes ../CAT/tests/data/prepare/nodes.dmp \
+    --db_dir db_tests/
+
+RUN CAT contigs -c ../CAT/tests/data/contigs/small_contigs.fa \
+    -d db_tests/db/ -t db_tests/tax/
 
 # ## Test ##
 # FROM app as test
@@ -80,5 +101,6 @@ ENV PATH="${PATH}:/CAT/CAT_pack"
 
 # RUN mkdir ../tests/
 # COPY tests/ ../tests/
+
 
 # RUN python3 -m unittest discover -v -s ../tests
