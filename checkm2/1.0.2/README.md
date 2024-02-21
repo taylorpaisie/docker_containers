@@ -25,6 +25,5 @@ checkm2 predict --input burk_wgs_pos_ctrl.fa \
 ```
 sha256sum burk_wgs_pos_ctrl.fa > burk_wgs_checksum.txt
 sha256sum burk_16S_neg_ctrl.fa > burk_16S_checksum.txt
-sha256sum neg_ctrl.fa > neg_ctrl_checksum.txt
 ```
 
