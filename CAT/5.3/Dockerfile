@@ -60,17 +60,12 @@ RUN wget http://github.com/bbuchfink/diamond/archive/v2.1.9.tar.gz &&\
     make -j4 &&\
     make install
 
-# Install CAT NCBI nr db
-# RUN mkdir /databases/ &&\
-#     CAT download --db nr -o databases/
-
 # Running the dockerfile and tests
 FROM ubuntu:focal as app
 ARG CAT_VER
 
 COPY --from=builder /usr/ /usr/
 COPY --from=builder /CAT-5.3/ /CAT/
-COPY --from=builder /diamond-2.1.9/ /diamond/
 
 # setting CAT to PATH
 ENV PATH="${PATH}:/CAT/CAT_pack"
