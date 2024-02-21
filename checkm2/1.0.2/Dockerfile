@@ -62,21 +62,17 @@ RUN wget http://github.com/bbuchfink/diamond/archive/v2.0.4.tar.gz &&\
     tar xzf v2.0.4.tar.gz &&\
     cd diamond-2.0.4 &&\
     mkdir bin && cd bin &&\
-    cmake -DCMAKE_INSTALL_PREFIX=$HOME .. &&\
+    cmake .. &&\
     make -j4 &&\
     make install
-
 
 # Running the dockerfile and tests
 FROM ubuntu:focal as app
 ARG CHECKM2_VER
 
-COPY --from=builder /checkm2/ /checkm2/
-COPY --from=builder /diamond-2.0.4/ /diamond-2.0.4/
-COPY --from=builder /usr/local/ /usr/local/
 COPY --from=builder /usr/ /usr/
 
-ENV PATH="${PATH}:/diamond-2.0.4/bin/"
+# ENV PATH="${PATH}:/diamond-2.0.4/bin/"
 
 # Setting working directory
 RUN mkdir data/
@@ -86,7 +82,7 @@ WORKDIR /data
 RUN checkm2 database --download
 
 # # run test with internal test data
-RUN checkm2 testrun --threads 4 --debug
+RUN checkm2 testrun
 
 # ## Test ##
 FROM app as test
