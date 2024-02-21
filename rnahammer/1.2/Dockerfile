@@ -21,21 +21,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     unzip \
     less \
-    automake \
-    cmake \
     zlib1g-dev\
     libzstd-dev \
     g++ \
     python3 \
     python3-pip \
-    git \
-    prodigal \
+    nano \
+    perl \
     hmmer \
     build-essential &&\
     apt-get autoclean && rm -rf /var/lib/apt/lists/*
 
 RUN wget https://services.healthtech.dtu.dk/download/8ec2d46a-4431-4dae-a868-e187a9ee9ae0/rnammer-1.2.Unix.tar.gz &&\
-    tar xvzf rnammer-1.2.Unix.tar.gz &&\
+    mkdir rnammer &&\
+    mv rnammer-1.2.Unix.tar.gz /rnammer/ &&\
+    cd /rnammer/ &&\
+    tar xvzf rnammer-1.2.Unix.tar.gz
 
 
 # Running the dockerfile and tests
@@ -43,11 +44,12 @@ FROM ubuntu:focal as app
 ARG RNAHAMMER_VER
 
 COPY --from=builder /usr/ /usr/
+COPY --from=builder /rnammer/ /rnammer/
 
-# setting CAT to PATH
-# ENV PATH="${PATH}:/CAT/CAT_pack"
+# # # setting RNAmmer to PATH
+ENV PATH="${PATH}:/rnammer/"
 
-# Setting working directory
+# # # Setting working directory
 RUN mkdir data/
 WORKDIR /data
 
