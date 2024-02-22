@@ -13,4 +13,4 @@ checkm2 predict --threads 4 \
 # run checksum on files
 sha256sum burk_wgs_pos_ctrl.fa > burk_wgs_checksum.txt
 sha256sum burk_16S_neg_ctrl.fa > burk_16S_checksum.txt
-
+sha256sum tests_output/quality_report.tsv > quality_report_checksum.txt
