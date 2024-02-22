@@ -18,9 +18,9 @@ Downloads whole genome sequence of *Burkholderia psuedomallei* and a set of MAGs
 Get test data:
 ```
 # Download test data
-wget -nv https://raw.githubusercontent.com/taylorpaisie/docker_containers/main/checkm2/1.0.2/burk_wgs.fa -O burk_wgs_pos_ctrl.fa
+wget -nv --no-check-certificate https://raw.githubusercontent.com/taylorpaisie/docker_containers/main/checkm2/1.0.2/burk_wgs.fa -O burk_wgs_pos_ctrl.fa
 
-wget -nv https://merenlab.org/data/refining-mags/files/GN02_MAG_IV_B_1-contigs.fa -O GN02_MAG_IV_B_1-contigs.fa
+wget -nv --no-check-certificate https://merenlab.org/data/refining-mags/files/GN02_MAG_IV_B_1-contigs.fa -O GN02_MAG_IV_B_1-contigs.fa
 ```
 
 Use CAT and BAT for taxonomic classification for both best datasets:
