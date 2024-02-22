@@ -5,6 +5,7 @@ ARG DIAMOND_VER="2.0.4"
 # build Dockerfile
 FROM ubuntu:focal as builder
 ARG CHECKM2_VER
+ARG DIAMOND_VER
 
 LABEL base.image="ubuntu:focal"
 LABEL dockerfile.version="1"
@@ -53,18 +54,19 @@ RUN pip install --no-cache-dir \
 
 
 # Clone CheckM2 repository and install
-RUN git clone https://github.com/chklovski/checkm2.git &&\
+RUN git config --global http.postBuffer 524288000 && \
+    git clone https://github.com/chklovski/checkm2.git &&\
     cd checkm2 &&\
     python3 setup.py install &&\
     cd ..
 
 # Install Diamond
-RUN wget http://github.com/bbuchfink/diamond/archive/v${DIAMOND_VER}.tar.gz &&\
-    tar xzf v${DIAMOND_VER}.tar.gz &&\
-    cd diamond-${DIAMOND_VER} &&\
-    mkdir bin && cd bin &&\
-    cmake .. &&\
-    make -j4 &&\
+RUN wget http://github.com/bbuchfink/diamond/archive/v${DIAMOND_VER}.tar.gz && \
+    tar xzf v${DIAMOND_VER}.tar.gz && \
+    cd diamond-${DIAMOND_VER} && \
+    mkdir bin && cd bin && \
+    cmake .. && \
+    make -j4 && \
     make install
 
 # Running the dockerfile and tests
