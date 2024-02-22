@@ -9,23 +9,29 @@ Contig Annotation Tool (CAT) and Bin Annotation Tool (BAT) are pipelines for the
 
 ## WARNING: CAT needs a large database to run 
 
+In order to run CAT/BAT, the NCBI or GTDB database must be downloaded.  Both these databases are very large.  These tests to run the CAT Docker image 
+
 ## Example analysis
+
+Downloads whole genome sequence of *Burkholderia psuedomallei* and a set of MAGs from *Gracilibacteria*
+
 Get test data:
 ```
 # Download test data
-wget -nv https://raw.githubusercontent.com/taylorpaisie/docker_containers/main/rdp/2.14/16S_rRNA_gene.Burkholderia_pseudomallei.2002721184.AY305776.1.fasta -O 16S_test.fa
-wget -nv https://raw.githubusercontent.com/taylorpaisie/docker_containers/main/rdp/2.14/18S_rRNA_gene.Homo_sapiens.T2T-CHM13v2.0.Chromosome13.fasta -O 18S_test.fa
+wget -nv https://raw.githubusercontent.com/taylorpaisie/docker_containers/main/checkm2/1.0.2/burk_wgs.fa -O burk_wgs_pos_ctrl.fa
+
+wget -nv https://merenlab.org/data/refining-mags/files/GN02_MAG_IV_B_1-contigs.fa -O GN02_MAG_IV_B_1-contigs.fa
 ```
 
-Use RDP Classifier to get taxonomic assignments for bacterial and archaeal 16S rRNA sequences:
+Use CAT and BAT for taxonomic classification for both best datasets:
 ```
-classifier classify -o taxa_16S_test.txt 16S_test.fa
-classifier classify -o taxa_18S_test.txt 18S_test.fa
-```
+# Running CAT on contigs
+CAT contigs -c burk_wgs_pos_ctrl.fa \
+    -d /scicomp/groups-pure/OID/NCEZID/DHCPP/BSPB/ZSAL/.databases/CAT/20231120_CAT_nr/db \
+    -t /scicomp/groups-pure/OID/NCEZID/DHCPP/BSPB/ZSAL/.databases/CAT/20231120_CAT_nr/tax
 
-## Output
-```
-head -2 taxa_16S_test.txt
-
-AY305776.1		Root	rootrank	1.0	Bacteria	domain	1.0	Pseudomonadota	phylum	1.0	Betaproteobacteria	class	1.0	Burkholderiales	order	1.0	Burkholderiaceae	family	1.0	Burkholderia	genus	1.0
+# Running BAT on a set of MAGs
+CAT bins -b GN02_MAG_IV_B_1-contigs.fa \
+    -d /scicomp/groups-pure/OID/NCEZID/DHCPP/BSPB/ZSAL/.databases/CAT/20231120_CAT_nr/db \
+    -t /scicomp/groups-pure/OID/NCEZID/DHCPP/BSPB/ZSAL/.databases/CAT/20231120_CAT_nr/tax
 ```
