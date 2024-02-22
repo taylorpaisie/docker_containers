@@ -1,9 +1,11 @@
 # set global variables
 ARG CAT_VER="5.3"
+ARG DIAMOND_VER="2.1.9"
 
 # build Dockerfile
 FROM ubuntu:focal as builder
 ARG CAT_VER
+ARG DIAMOND_VER
 
 LABEL base.image="ubuntu:focal"
 LABEL dockerfile.version="1"
@@ -26,13 +28,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     cmake \
     zlib1g-dev\
     libzstd-dev \
-    g++ \
-    # ca-certificates \
     python3 \
     python3-pip \
     git \
     prodigal \
-    ncbi-blast+ \
     build-essential &&\
     apt-get autoclean && rm -rf /var/lib/apt/lists/*
 
@@ -42,19 +41,19 @@ RUN pip install --no-cache-dir \
     biopython
 
 # clone CAT from git repo    
-RUN wget https://github.com/dutilh/CAT/archive/refs/tags/v5.3.tar.gz &&\
-    tar xvzf v5.3.tar.gz &&\
-    cd CAT-5.3/ &&\
+RUN wget https://github.com/dutilh/CAT/archive/refs/tags/v${CAT_VER}.tar.gz &&\
+    tar xvzf v${CAT_VER}.tar.gz &&\
+    cd CAT-${CAT_VER}/ &&\
     chmod +x CAT_pack/CAT &&\
     cd ..
 
-
+# Set CAT/BAT in path
 ENV PATH="${PATH}:/CAT/CAT_pack"
 
 # Install Diamond
-RUN wget http://github.com/bbuchfink/diamond/archive/v2.1.9.tar.gz &&\
-    tar xzf v2.1.9.tar.gz &&\
-    cd diamond-2.1.9 &&\
+RUN wget http://github.com/bbuchfink/diamond/archive/v${DIAMOND_VER}.tar.gz &&\
+    tar xzf v${DIAMOND_VER}.tar.gz &&\
+    cd diamond-${DIAMOND_VER} &&\
     mkdir bin && cd bin &&\
     cmake .. &&\
     make -j4 &&\
@@ -63,9 +62,10 @@ RUN wget http://github.com/bbuchfink/diamond/archive/v2.1.9.tar.gz &&\
 # Running the dockerfile and tests
 FROM ubuntu:focal as app
 ARG CAT_VER
+ARG DIAMOND_VER
 
 COPY --from=builder /usr/ /usr/
-COPY --from=builder /CAT-5.3/ /CAT/
+COPY --from=builder /CAT-${CAT_VER}/ /CAT/
 
 # setting CAT to PATH
 ENV PATH="${PATH}:/CAT/CAT_pack"
