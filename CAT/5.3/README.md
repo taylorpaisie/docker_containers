@@ -27,11 +27,11 @@ Use CAT and BAT for taxonomic classification for both best datasets:
 ```
 # Running CAT on contigs
 CAT contigs -c burk_wgs_pos_ctrl.fa \
-    -d /scicomp/groups-pure/OID/NCEZID/DHCPP/BSPB/ZSAL/.databases/CAT/20231120_CAT_nr/db \
-    -t /scicomp/groups-pure/OID/NCEZID/DHCPP/BSPB/ZSAL/.databases/CAT/20231120_CAT_nr/tax
+    -d /$LAB_HOME/.databases/CAT/20231120_CAT_nr/db \
+    -t /$LAB_HOME/.databases/CAT/20231120_CAT_nr/tax
 
 # Running BAT on a set of MAGs
 CAT bins -b GN02_MAG_IV_B_1-contigs.fa \
-    -d /scicomp/groups-pure/OID/NCEZID/DHCPP/BSPB/ZSAL/.databases/CAT/20231120_CAT_nr/db \
-    -t /scicomp/groups-pure/OID/NCEZID/DHCPP/BSPB/ZSAL/.databases/CAT/20231120_CAT_nr/tax
+    -d /$LAB_HOME/.databases/CAT/20231120_CAT_nr/db \
+    -t /$LAB_HOME/.databases/CAT/20231120_CAT_nr/tax
 ```
