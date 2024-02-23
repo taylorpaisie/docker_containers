@@ -36,6 +36,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     curl \
     libcurl4-openssl-dev \
+    openssl \
     ca-certificates \
     git \
     python3 \
@@ -94,6 +95,7 @@ ARG PILERCR_VER
 COPY --from=builder /usr/ /usr/
 COPY --from=builder /amr/ /amr/
 COPY --from=builder /pilercr/ /pilercr/
+COPY --from=builder /etc/ /etc/
 
 ENV PATH="${PATH}:/amr/"
 ENV PATH="${PATH}:/pilercr/"
