@@ -2,12 +2,14 @@
 ARG BAKTA_VER="1.9.2"
 ARG DIAMOND_VER="2.0.14"
 ARG AMRFINDER_VER="3.12.8"
+ARG PILERCR_VER="1.06"
 
 # build Dockerfile
 FROM ubuntu:focal as builder
 ARG BAKTA_VER
 ARG DIAMOND_VER
 ARG AMRFINDER_VER
+ARG PILERCR_VER
 
 LABEL base.image="ubuntu:focal"
 LABEL dockerfile.version="1"
@@ -31,12 +33,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zlib1g-dev\
     libzstd-dev \
     g++ \
+    gcc \
+    curl \
+    libcurl4-openssl-dev \
+    ca-certificates \
     git \
     python3 \
     python3-pip \
     infernal \
     ncbi-blast+ \
-    piler-cr \
+    aragorn \
     trnascan-se \
     build-essential &&\
     apt-get autoclean && rm -rf /var/lib/apt/lists/*
@@ -52,8 +58,6 @@ RUN pip install --no-cache-dir \
     pyhmmer==0.10.0 \
     pyrodigal==2.1.0 \
     alive-progress \
-    aragorn \
-
     circos \
     bakta==1.9.2
 
@@ -72,17 +76,35 @@ RUN git clone https://github.com/ncbi/amr.git && \
     git checkout master && \
     make && \
     make clean && \
-    make DEFAULT_DB_DIR=/usr/local/share/amrfinder/data && \
+    make DEFAULT_DB_DIR=/usr/amrfinder/data && \
     make install INSTALL_DIR=$HOME/amrfinder
+
+# Install piler-cr
+RUN mkdir pilercr && cd pilercr && \
+    wget https://www.drive5.com/pilercr/pilercr${PILERCR_VER}.tar.gz && \
+    tar xvzf pilercr${PILERCR_VER}.tar.gz
 
 # Running the dockerfile and tests
 FROM ubuntu:focal as app
 ARG CHECKM2_VER
 ARG DIAMOND_VER
 ARG AMRFINDER_VER
+ARG PILERCR_VER
 
 COPY --from=builder /usr/ /usr/
+COPY --from=builder /amr/ /amr/
+COPY --from=builder /pilercr/ /pilercr/
+
+ENV PATH="${PATH}:/amr/"
+ENV PATH="${PATH}:/pilercr/"
 
 # Setting working directory
-RUN mkdir data/
-WORKDIR /data
+# RUN mkdir data/
+# WORKDIR /data
+
+# RUN bakta --help && \
+#     bakta_db --help && \
+#     bakta --version
+
+# RUN bakta_db list && \
+#     bakta_db download --type light 
