@@ -101,12 +101,12 @@ ENV PATH="${PATH}:/amr/"
 ENV PATH="${PATH}:/pilercr/"
 
 # Setting working directory
-# RUN mkdir data/
-# WORKDIR /data
+RUN mkdir data/
+WORKDIR /data
 
 # RUN bakta --help && \
 #     bakta_db --help && \
 #     bakta --version
 
-# RUN bakta_db list && \
-#     bakta_db download --type light 
+RUN bakta_db list && \
+    bakta_db download --type light 
