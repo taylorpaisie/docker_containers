@@ -1,9 +1,11 @@
 # set global variables
 ARG CENTRIFUGE_VER="1.0.2"
+ARG SRATOOLKIT_VER="3.0.7"
 
 # build Dockerfile
 FROM ubuntu:focal as builder
 ARG CENTRIFUGE_VER
+ARG SRATOOLKIT_VER
 
 LABEL base.image="ubuntu:focal"
 LABEL dockerfile.version="1"
@@ -39,9 +41,16 @@ RUN git clone https://github.com/DaehwanKimLab/centrifuge && \
     make && \
     make install prefix=/usr/local
 
+RUN wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-ubuntu64.tar.gz && \
+    tar xvzf sratoolkit.current-ubuntu64.tar.gz
+
+ENV export PATH=$PATH:$PWD/sratoolkit.${SRATOOLKIT_VER}-ubuntu64/bin
+
+
 # Running the dockerfile and tests
 FROM ubuntu:focal as app
 ARG CENTRIFUGE_VER
+ARG SRATOOLKIT_VER
 
 COPY --from=builder /usr/ /usr/
 # COPY --from=builder /usr/local/ /usr/local/
