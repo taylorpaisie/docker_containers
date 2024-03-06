@@ -27,11 +27,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     less \
     automake \
     cmake \
-    zlib1g-dev\
+    zlib1g-dev \
     libzstd-dev \
     g++ \
-    python3 \
-    python3-pip \
     git \
     build-essential &&\
     apt-get autoclean && rm -rf /var/lib/apt/lists/*
