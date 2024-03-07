@@ -65,9 +65,6 @@ ARG BLASTPLUS_VER
 COPY --from=builder /centrifuge-${CENTRIFUGE_VER}/ /centrifuge-${CENTRIFUGE_VER}/
 COPY --from=builder /usr/ /usr/
 
-# ENV PATH="${PATH}:/centrifuge-${CENTRIFUGE_VER}"
-ENV PATH="${PATH}:/usr/local/bin"
-
 # # Setting working directory
 RUN mkdir data/
 WORKDIR /data
