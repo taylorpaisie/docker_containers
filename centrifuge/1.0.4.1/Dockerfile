@@ -1,13 +1,11 @@
 # set global variables
 ARG CENTRIFUGE_VER="1.0.4.1"
-# ARG SRATOOLKIT_VER="3.1.0"
 ARG BLASTPLUS_VER="2.15.0"
 
 # build Dockerfile
 FROM ubuntu:focal as builder
 ARG CENTRIFUGE_VER
 ARG BLASTPLUS_VER
-# ARG SRATOOLKIT_VER
 
 LABEL base.image="ubuntu:focal"
 LABEL dockerfile.version="1"
@@ -45,20 +43,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential &&\
     apt-get autoclean && rm -rf /var/lib/apt/lists/*
 
-# RUN git clone https://github.com/DaehwanKimLab/centrifuge && \
-#     cd centrifuge && \
-#     make && \
-#     make install prefix=/usr/local
-
 RUN wget --no-check-certificate https://github.com/DaehwanKimLab/centrifuge/archive/refs/tags/v1.0.4.1.tar.gz && \
     tar xvf v${CENTRIFUGE_VER}.tar.gz && \
     cd centrifuge-${CENTRIFUGE_VER} && \
     make && \
     make install prefix=/usr/local
 
-
 # Install BLAST+
-# RUN wget --no-check-certificate https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/${BLASTPLUS_VER}/ncbi-blast-${BLASTPLUS_VER}+-x64-linux.tar.gz && \
 RUN wget --no-check-certificate https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.15.0/ncbi-blast-2.15.0+-x64-linux.tar.gz && \
     tar xvf ncbi-blast-2.15.0+-x64-linux.tar.gz && \
     mv ncbi-blast-2.15.0+/bin/* /usr/local/bin
@@ -70,7 +61,6 @@ ENV PATH="${PATH}:/usr/local/bin"
 FROM ubuntu:focal as app
 ARG CENTRIFUGE_VER
 ARG BLASTPLUS_VER
-# ARG SRATOOLKIT_VER
 
 COPY --from=builder /centrifuge-${CENTRIFUGE_VER}/ /centrifuge-${CENTRIFUGE_VER}/
 COPY --from=builder /usr/ /usr/
