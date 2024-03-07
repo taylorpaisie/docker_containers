@@ -31,3 +31,11 @@ centrifuge-build --conversion-table \
 # Running Centrifuge on the built-in test dataset 
 centrifuge -f -x test ../centrifuge-1.0.4.1/example/reads/input.fa
 ```
+
+#### Running Centrifuge with pre-built NCBI database and test dataset
+```
+# Download positive and negative control test data
+wget -nv --no-check-certificate https://raw.githubusercontent.com/taylorpaisie/docker_containers/main/checkm2/1.0.2/burk_wgs.fa -O burk_wgs_pos_ctrl.fa
+wget -nv --no-check-certificate https://raw.githubusercontent.com/taylorpaisie/docker_containers/main/checkm2/1.0.2/burk_16S.fa -O burk_16S_neg_ctrl.fa
+
+```
