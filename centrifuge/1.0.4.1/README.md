@@ -38,4 +38,8 @@ centrifuge -f -x test ../centrifuge-1.0.4.1/example/reads/input.fa
 wget -nv --no-check-certificate https://raw.githubusercontent.com/taylorpaisie/docker_containers/main/checkm2/1.0.2/burk_wgs.fa -O burk_wgs_pos_ctrl.fa
 wget -nv --no-check-certificate https://raw.githubusercontent.com/taylorpaisie/docker_containers/main/checkm2/1.0.2/burk_16S.fa -O burk_16S_neg_ctrl.fa
 
+
+# Running centrifuge with NCBI database
+centrifuge -f -x $LAB_HOME/.databases/centrifuge/hpvc --report-file-name pos_ctrl_centrifuge_report.tsv burk_wgs_pos_ctrl.fa  
+centrifuge -f -x $LAB_HOME/.databases/centrifuge/hpvc --report-file-name neg_ctrl_centrifuge_report.tsv burk_16S_neg_ctrl.fa      
 ```
