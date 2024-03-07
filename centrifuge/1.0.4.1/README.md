@@ -40,6 +40,6 @@ wget -nv --no-check-certificate https://raw.githubusercontent.com/taylorpaisie/d
 
 
 # Running centrifuge with NCBI database
-centrifuge -f -x $LAB_HOME/.databases/centrifuge/hpvc --report-file-name pos_ctrl_centrifuge_report.tsv burk_wgs_pos_ctrl.fa  
-centrifuge -f -x $LAB_HOME/.databases/centrifuge/hpvc --report-file-name neg_ctrl_centrifuge_report.tsv burk_16S_neg_ctrl.fa      
+centrifuge -f -x $LAB_HOME/.databases/centrifuge/hpvc --report-file pos_ctrl_centrifuge_report.tsv burk_wgs_pos_ctrl.fa  
+centrifuge -f -x $LAB_HOME/.databases/centrifuge/hpvc --report-file neg_ctrl_centrifuge_report.tsv burk_16S_neg_ctrl.fa      
 ```
