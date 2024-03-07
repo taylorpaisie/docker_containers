@@ -62,17 +62,6 @@ RUN wget --no-check-certificate https://github.com/DaehwanKimLab/centrifuge/arch
 RUN wget --no-check-certificate https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.15.0/ncbi-blast-2.15.0+-x64-linux.tar.gz && \
     tar xvf ncbi-blast-2.15.0+-x64-linux.tar.gz && \
     mv ncbi-blast-2.15.0+/bin/* /usr/local/bin
-    # tar xvf ncbi-blast-${BLASTPLUS_VER}+-x64-linux.tar.gz && \
-    # && rm ncbi-blast-${BLASTPLUS_VER}+-x64-linux.tar.gz \
-    # mv ncbi-blast-${BLASTPLUS_VER}+/bin/* /usr/local/bin/
-
-
-# RUN wget --no-check-certificate https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-ubuntu64.tar.gz && \
-#     tar xvzf sratoolkit.current-ubuntu64.tar.gz
-
-
-# ENV export PATH="$PATH:/centrifuge-${CENTRIFUGE_VER}"
-# ENV export PATH="$PATH:/sratoolkit.${SRATOOLKIT_VER}-ubuntu64/bin"
 
 ENV PATH="${PATH}:/centrifuge-${CENTRIFUGE_VER}"
 ENV PATH="${PATH}:/usr/local/bin"
@@ -83,15 +72,35 @@ ARG CENTRIFUGE_VER
 ARG BLASTPLUS_VER
 # ARG SRATOOLKIT_VER
 
+COPY --from=builder /centrifuge-${CENTRIFUGE_VER}/ /centrifuge-${CENTRIFUGE_VER}/
 COPY --from=builder /usr/ /usr/
 
-# Copy certificates for wget
-# COPY --from=builder /etc/ssl/certs/ /etc/ssl/certs/
-
-# ENV export PATH="${PATH}:/sratoolkit.${SRATOOLKIT_VER}-ubuntu64/bin"
-
+ENV PATH="${PATH}:/centrifuge-${CENTRIFUGE_VER}"
+ENV PATH="${PATH}:/usr/local/bin"
 
 # # Setting working directory
 RUN mkdir data/
 WORKDIR /data
+
+RUN centrifuge-build --conversion-table \
+    ../centrifuge-1.0.4.1/example/reference/gi_to_tid.dmp \
+    --taxonomy-tree ../centrifuge-1.0.4.1/example/reference/nodes.dmp \
+    --name-table ../centrifuge-1.0.4.1/example/reference/names.dmp \
+    ../centrifuge-1.0.4.1/example/reference/test.fa test
+
+RUN centrifuge -f -x test ../centrifuge-1.0.4.1/example/reads/input.fa
+
+
+# ## Test ##
+# FROM app as test
+
+# RUN apt-get update && apt-get install -y \
+#     python3 \
+#     wget
+
+# RUN mkdir ../tests/
+# COPY tests/ ../tests/
+
+
+# RUN python3 -m unittest discover -v -s ../tests
 
