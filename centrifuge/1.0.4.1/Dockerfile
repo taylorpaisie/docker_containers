@@ -50,9 +50,9 @@ RUN wget --no-check-certificate https://github.com/DaehwanKimLab/centrifuge/arch
     make install prefix=/usr/local
 
 # Install BLAST+
-RUN wget --no-check-certificate https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.15.0/ncbi-blast-2.15.0+-x64-linux.tar.gz && \
-    tar xvf ncbi-blast-2.15.0+-x64-linux.tar.gz && \
-    mv ncbi-blast-2.15.0+/bin/* /usr/local/bin
+RUN wget --no-check-certificate https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.15.0/ncbi-blast-${BLASTPLUS_VER}+-x64-linux.tar.gz && \
+    tar xvf ncbi-blast-${BLASTPLUS_VER}+-x64-linux.tar.gz && \
+    mv ncbi-blast-${BLASTPLUS_VER}+/bin/* /usr/local/bin
 
 ENV PATH="${PATH}:/centrifuge-${CENTRIFUGE_VER}"
 ENV PATH="${PATH}:/usr/local/bin"
