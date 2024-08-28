@@ -1,8 +1,8 @@
-# set global variables
+# Set global variables
 ARG HOCORT_VER="1.1.0"
 
-# build Dockerfile
-FROM ubuntu:focal as builder
+# Build Dockerfile
+FROM ubuntu:focal AS builder
 ARG HOCORT_VER
 
 LABEL base.image="ubuntu:focal"
@@ -17,63 +17,47 @@ LABEL maintainer.email='ltj8@cdc.gov'
 
 ENV DEBIAN_FRONTEND=noninteractive 
 
-# Install dependencies
+# Install required dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     unzip \
-    less \
-    automake \
-    cmake \
-    zlib1g-dev\
-    libzstd-dev \
-    g++ \
-    python3 \
     python3-pip \
-    git \
-    build-essential &&\
-    apt-get autoclean && rm -rf /var/lib/apt/lists/*
+    build-essential \
+    curl \
+    # samtools \
+    # bowtie2 \
+    # hisat2 \
+    # bbmap \
+    # minimap2 \
+    && rm -rf /var/lib/apt/lists/*
 
-# install checkm2 and its dependencies
-RUN pip install --no-cache-dir \
-    samtools >=1.8 \
-    tbb == 2020.2 \
-    kraken2 >=2.1.2 \
-    bowtie2 \
-    hisat2 \
-    bwa-mem2 \
-    bbmap \
-    minimap2 \
-    biobloomtools
 
+# Install Miniconda
+RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /miniconda.sh && \
+    bash /miniconda.sh -b -p /opt/conda && \
+    rm /miniconda.sh && \
+    /opt/conda/bin/conda clean -t -i -p -y && \
+    ln -s /opt/conda/bin/conda /usr/local/bin/conda
+
+# Update conda and install TBB
+RUN conda update -n base -c defaults conda && \
+    # conda install -c conda-forge tbb==2020.2 &&\
+    # conda install -c bioconda -c conda-forge biobloomtools &&\
+    conda create -n hocort -c conda-forge -c bioconda hocort
 
 
 # Install HoCoRT
-RUN wget https://raw.githubusercontent.com/ignasrum/hocort/main/install.sh && \ 
-    wget https://raw.githubusercontent.com/ignasrum/hocort/main/environment.yml && \
-    bash ./install.sh && \
-    conda activate hocort
-
+# RUN wget https://raw.githubusercontent.com/ignasrum/hocort/main/install.sh && \ 
+#     wget https://raw.githubusercontent.com/ignasrum/hocort/main/environment.yml && \
+#     bash ./install.sh && \
+#     /opt/conda/bin/conda activate hocort
 
 # Running the dockerfile and tests
-FROM ubuntu:focal as app
+FROM ubuntu:focal AS app
 ARG HOCORT_VER
 
 COPY --from=builder /usr/ /usr/
 
 # Setting working directory
-RUN mkdir data/
+RUN mkdir /data
 WORKDIR /data
-
-
-# ## Test ##
-# FROM app as test
-
-# RUN apt-get update && apt-get install -y \
-#     python3 \
-#     wget
-
-# RUN mkdir ../tests/
-# COPY tests/ ../tests/
-
-# RUN python3 -m unittest discover -v -s ../tests
-
