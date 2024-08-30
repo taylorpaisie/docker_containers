@@ -55,6 +55,8 @@ FROM ubuntu:focal AS app
 ARG HOCORT_VER
 
 COPY --from=builder /usr/ /usr/
+# COPY --from=builder /opt/conda/ /opt/conda/
+
 
 # Setting working directory
 RUN mkdir /data
