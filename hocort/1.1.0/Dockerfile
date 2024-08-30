@@ -24,13 +24,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-pip \
     build-essential \
     curl \
-    # samtools \
-    # bowtie2 \
-    # hisat2 \
-    # bbmap \
-    # minimap2 \
+    git \
     && rm -rf /var/lib/apt/lists/*
-
 
 # Install Miniconda
 RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /miniconda.sh && \
@@ -39,18 +34,21 @@ RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -
     /opt/conda/bin/conda clean -t -i -p -y && \
     ln -s /opt/conda/bin/conda /usr/local/bin/conda
 
-# Update conda and install TBB
+# Update conda, install git, TBB, and switch to the classic solver
 RUN conda update -n base -c defaults conda && \
-    # conda install -c conda-forge tbb==2020.2 &&\
-    # conda install -c bioconda -c conda-forge biobloomtools &&\
-    conda create -n hocort -c conda-forge -c bioconda hocort
-
+    conda config --set solver classic && \
+    conda install -c conda-forge tbb==2020.2 git && \
+    conda install -c bioconda -c conda-forge biobloomtools
 
 # Install HoCoRT
-# RUN wget https://raw.githubusercontent.com/ignasrum/hocort/main/install.sh && \ 
-#     wget https://raw.githubusercontent.com/ignasrum/hocort/main/environment.yml && \
-#     bash ./install.sh && \
-#     /opt/conda/bin/conda activate hocort
+RUN wget https://raw.githubusercontent.com/ignasrum/hocort/main/install.sh && \
+    wget https://raw.githubusercontent.com/ignasrum/hocort/main/environment.yml && \
+    sed -i '/conda activate hocort/a conda install -n hocort -c conda-forge git' install.sh && \
+    bash ./install.sh
+
+# Use bash shell to activate the conda environment correctly
+SHELL ["/bin/bash", "-c"]
+RUN source /opt/conda/bin/activate hocort && conda activate hocort
 
 # Running the dockerfile and tests
 FROM ubuntu:focal AS app
