@@ -34,6 +34,9 @@ RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -
     /opt/conda/bin/conda clean -t -i -p -y && \
     ln -s /opt/conda/bin/conda /usr/local/bin/conda
 
+# Initialize Conda for bash
+RUN /opt/conda/bin/conda init bash
+
 # Update conda, install git, TBB, and switch to the classic solver
 RUN conda update -n base -c defaults conda && \
     conda config --set solver classic && \
@@ -48,15 +51,14 @@ RUN wget https://raw.githubusercontent.com/ignasrum/hocort/main/install.sh && \
 
 # Use bash shell to activate the conda environment correctly
 SHELL ["/bin/bash", "-c"]
-RUN source /opt/conda/bin/activate hocort && conda activate hocort
+RUN echo "source /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
+    echo "conda activate hocort" >> ~/.bashrc
 
 # Running the dockerfile and tests
 FROM ubuntu:focal AS app
 ARG HOCORT_VER
 
 COPY --from=builder /usr/ /usr/
-# COPY --from=builder /opt/conda/ /opt/conda/
-
 
 # Setting working directory
 RUN mkdir /data
