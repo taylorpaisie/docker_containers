@@ -32,6 +32,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
+# Set the working directory to /root
+WORKDIR /root
+
 # Run commands in non-interactive mode
 RUN curl https://nim-lang.org/choosenim/init.sh -sSf | sh -s -- -y &&\
     git clone https://github.com/telatin/seqfu2 &&\
@@ -39,11 +42,18 @@ RUN curl https://nim-lang.org/choosenim/init.sh -sSf | sh -s -- -y &&\
     make &&\
     make test
 
-# Running the dockerfile and tests
+# Debugging: List files to check where seqfu binary is located
+RUN find /root/seqfu2 -type f
+
+# Copy the built binary to a location in the PATH
+RUN cp /root/seqfu2/bin/seqfu /usr/local/bin/seqfu
+
+# Final image
 FROM ubuntu:focal AS app
 ARG SEQFU_VER
 
-COPY --from=builder /usr/ /usr/
+# Copy the necessary files from the builder
+COPY --from=builder /usr/local/bin/seqfu /usr/local/bin/seqfu
 
 # Setting working directory
 RUN mkdir /data
