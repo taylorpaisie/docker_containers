@@ -1,5 +1,5 @@
 # Set global variables
-ARG SEQFU_VER="1.20.3"
+ARG SEQFU_VER="1.22.0"
 
 # Build Dockerfile
 FROM ubuntu:focal AS builder
