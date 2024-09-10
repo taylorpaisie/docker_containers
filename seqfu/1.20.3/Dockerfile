@@ -58,3 +58,14 @@ COPY --from=builder /usr/local/bin/seqfu /usr/local/bin/seqfu
 # Setting working directory
 RUN mkdir /data
 WORKDIR /data
+
+# Running seqfu on test controls
+FROM app as test
+
+RUN apt-get update && apt-get install -y \
+    python3 \
+    wget
+
+RUN mkdir ../tests/
+COPY tests/ ../tests/
+RUN python3 -m unittest discover -v -s ../tests
