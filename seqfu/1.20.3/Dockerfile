@@ -60,6 +60,9 @@ COPY --from=builder /root/seqfu2/data/tests /root/seqfu2/data/tests
 RUN mkdir /data
 WORKDIR /data
 
+RUN seqfu --version &&\
+    seqfu --help
+
 # Running seqfu on test controls
 # FROM app as test
 
