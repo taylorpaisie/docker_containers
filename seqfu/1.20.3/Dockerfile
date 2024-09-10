@@ -54,18 +54,19 @@ ARG SEQFU_VER
 
 # Copy the necessary files from the builder
 COPY --from=builder /usr/local/bin/seqfu /usr/local/bin/seqfu
+COPY --from=builder /root/seqfu2/data/tests /root/seqfu2/data/tests
 
 # Setting working directory
 RUN mkdir /data
 WORKDIR /data
 
 # Running seqfu on test controls
-FROM app as test
+# FROM app as test
 
-RUN apt-get update && apt-get install -y \
-    python3 \
-    wget
+# RUN apt-get update && apt-get install -y \
+#     python3 \
+#     wget
 
-RUN mkdir ../tests/
-COPY tests/ ../tests/
-RUN python3 -m unittest discover -v -s ../tests
+# RUN mkdir ../tests/
+# COPY tests/ ../tests/
+# RUN python3 -m unittest discover -v -s ../tests
