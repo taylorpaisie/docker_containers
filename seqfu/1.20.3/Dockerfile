@@ -43,23 +43,11 @@ RUN curl https://nim-lang.org/choosenim/init.sh -sSf | sh -s -- -y && \
     tar -xzf v${SEQFU_VER}.tar.gz && \
     rm -r v${SEQFU_VER}.tar.gz && \
     cd seqfu2-${SEQFU_VER} && \
-    make 2>&1 | tee /tmp/make_output.log && \
-    # Print the make output log to check for errors
-    echo "Contents of /tmp/make_output.log:" && \
-    cat /tmp/make_output.log && \
-    # Debug: Print all files in the project directory
-    echo "Checking all contents of the project directory:" && \
-    find /root/seqfu2-${SEQFU_VER}/ -type f && \
-    # Debug: Print all files in the bin directory
-    echo "Checking contents of bin directory:" && \
-    ls -la /root/seqfu2-${SEQFU_VER}/bin/ && \
-    # Ensure 'fu-split' is built and in the correct directory
-    if [ ! -f "/root/seqfu2-${SEQFU_VER}/bin/fu-split" ]; then echo "fu-split not found!"; exit 1; fi && \
+    # make 2>&1 | tee /tmp/make_output.log && \
+    make && \
     # Run tests and allow build to continue even if some tests fail
     make test VERBOSE=1 || (echo "Tests failed, but continuing build"; exit 0)
 
-# Debugging: List files to check where seqfu binary is located
-RUN find /root/seqfu2-${SEQFU_VER} -type f
 
 # Copy the built binary to a location in the PATH
 RUN cp /root/seqfu2-${SEQFU_VER}/bin/seqfu /usr/local/bin/seqfu
@@ -71,6 +59,11 @@ ARG SEQFU_VER
 # Copy the necessary files from the builder
 COPY --from=builder /usr/local/bin/seqfu /usr/local/bin/seqfu
 COPY --from=builder /root/seqfu2-${SEQFU_VER}/data/tests /root/seqfu2-${SEQFU_VER}/data/tests
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
 
 # Setting working directory
 RUN mkdir /data
