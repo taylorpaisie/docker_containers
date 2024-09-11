@@ -1,6 +1,6 @@
 # SeqFu
 
-Main tool: [SeqFu](https://sourceforge.net/projects/rdp-classifier/)
+Main tool: [SeqFu](https://github.com/telatin/seqfu2)
   
 Code repository: https://github.com/telatin/seqfu2
 
@@ -26,8 +26,8 @@ Basic information on how to use this tool:
   · view                : view sequences with colored quality and oligo matches
 ```
 
-- help: seqfu --help
-- version: seqfu --version
+- help: `seqfu --help`
+- version: `seqfu --version`
 - description: | 
 > A general-purpose program to manipulate and parse information from FASTA/FASTQ files, supporting gzipped input files. 
 
