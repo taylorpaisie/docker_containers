@@ -1,7 +1,7 @@
 # Set global variables
 ARG HOCORT_VER="1.1.0"
 
-# Build Dockerfile
+# Base image
 FROM ubuntu:focal AS builder
 ARG HOCORT_VER
 
@@ -17,49 +17,63 @@ LABEL maintainer.email='ltj8@cdc.gov'
 
 ENV DEBIAN_FRONTEND=noninteractive 
 
-# Install required dependencies
+# Install CA certificates along with other dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    g++ \
+    gcc \
     wget \
     unzip \
-    python3-pip \
-    build-essential \
-    curl \
+    ca-certificates \
     git \
-    && rm -rf /var/lib/apt/lists/*
+    libtbb-dev \
+    libbz2-dev \
+    liblzma-dev \
+    zlib1g-dev \
+    cmake \
+    automake \
+    autoconf && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install Miniconda
-RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /miniconda.sh && \
-    bash /miniconda.sh -b -p /opt/conda && \
-    rm /miniconda.sh && \
-    /opt/conda/bin/conda clean -t -i -p -y && \
-    ln -s /opt/conda/bin/conda /usr/local/bin/conda
 
-# Initialize Conda for bash
-RUN /opt/conda/bin/conda init bash
+# Disable SSL verification (use with caution)
+RUN git config --global http.sslVerify false
 
-# Update conda, install git, TBB, and switch to the classic solver
-RUN conda update -n base -c defaults conda && \
-    conda config --set solver classic && \
-    conda install -c conda-forge tbb==2020.2 git && \
-    conda install -c bioconda -c conda-forge biobloomtools
+# Then proceed with cloning sparsehash
+RUN git clone https://github.com/sparsehash/sparsehash.git && \
+    cd sparsehash && \
+    ./configure && \
+    make install && \
+    export SPARSEHASH_INCLUDE_DIR=$(pwd)/include
 
-# Install HoCoRT
-RUN wget https://raw.githubusercontent.com/ignasrum/hocort/main/install.sh && \
-    wget https://raw.githubusercontent.com/ignasrum/hocort/main/environment.yml && \
-    sed -i '/conda activate hocort/a conda install -n hocort -c conda-forge git' install.sh && \
-    bash ./install.sh
 
-# Use bash shell to activate the conda environment correctly
-SHELL ["/bin/bash", "-c"]
-RUN echo "source /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
-    echo "conda activate hocort" >> ~/.bashrc
+# Install sdsl-lite
+RUN git clone https://github.com/simongog/sdsl-lite.git && \
+    cd sdsl-lite && \
+    ./install.sh && \
+    export SDSL_INCLUDE_DIR=$(pwd)/include
 
-# Running the dockerfile and tests
-FROM ubuntu:focal AS app
-ARG HOCORT_VER
+# Install Biobloomtools from source
+RUN git clone https://github.com/bcgsc/biobloom.git && \
+    cd biobloom && \
+    git submodule update --init && \
+    ./autogen.sh && \
+    ./configure CXXFLAGS="-I/sdsl-lite/include -I$SPARSEHASH_INCLUDE_DIR" && \
+    sleep infinity
 
-COPY --from=builder /usr/ /usr/
 
-# Setting working directory
-RUN mkdir /data
-WORKDIR /data
+# # Install HoCoRT
+# RUN git clone https://github.com/ignasrum/hocort.git && \
+#     cd hocort && \
+#     pip3 install .
+
+# # Running the dockerfile and tests
+# FROM ubuntu:focal AS app
+# ARG HOCORT_VER
+
+# COPY --from=builder /usr/ /usr/
+# COPY --from=builder /opt/ /opt/
+
+# # Setting working directory
+# RUN mkdir /data
+# WORKDIR /data
