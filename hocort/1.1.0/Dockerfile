@@ -17,65 +17,107 @@ LABEL maintainer.email='ltj8@cdc.gov'
 
 ENV DEBIAN_FRONTEND=noninteractive 
 
-# Install required dependencies, including Boost and other build tools
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    g++ \
-    gcc \
-    libc6-dev \
-    libstdc++6 \
-    libtool \
-    pkg-config \
-    zlib1g-dev \
-    cmake \
-    wget \
-    git \
-    ca-certificates \
-    libtbb-dev \
-    libbz2-dev \
-    liblzma-dev \
-    automake \
-    autoconf \
-    libboost-all-dev \
-    lzma \
-    liblzma-dev \
-    python3 \
-    python3-pip && \
-    rm -rf /var/lib/apt/lists/*
+# Install necessary system dependencies
+RUN apt-get update && apt-get install -y \
+        build-essential \
+        g++ \
+        unzip \
+        gcc \
+        libboost-all-dev \
+        libbz2-dev \
+        cmake \
+        python3 \
+        python3-pip \
+        git \
+        wget \
+        zlib1g-dev \
+        bowtie2 \
+        kraken2 \
+        bwa \
+        minimap2 \
+        samtools \
+        bbmap \
+        pkg-config \
+        liblzma-dev \
+        libcurl4-gnutls-dev \
+        libssl-dev \
+        libgsl-dev && \
+        apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Disable SSL verification for git
-RUN git config --global http.sslVerify false
+# -------------------
+# BWA-MEM2 installation
+# -------------------
+RUN git clone https://github.com/bwa-mem2/bwa-mem2.git && \
+    cd bwa-mem2 && \
+    git submodule update --init --recursive && \
+    make -j$(nproc) && \
+    cp bwa-mem2* /usr/local/bin && \
+    cd .. && rm -rf bwa-mem2
 
-# Install SparseHash
+# -------------------
+# HISAT2 installation
+# -------------------
+RUN wget https://cloud.biohpc.swmed.edu/index.php/s/hisat2-220-source/download -O hisat2.zip && \
+    unzip hisat2.zip && \
+    cd hisat2-2.2.0 && \
+    make -j$(nproc) && \
+    cp -r hisat2* /usr/local/bin && \
+    cd .. && rm -rf hisat2-2.2.0 hisat2.zip
+
+
+# -------------------
+# SparseHash installation
+# -------------------
 RUN git clone https://github.com/sparsehash/sparsehash.git && \
     cd sparsehash && \
     ./configure && \
     make && \
-    make install
+    make install && \
+    cd .. && rm -rf sparsehash
 
+# -------------------
+# SDSL-Lite installation
+# -------------------
 # Install SDSL-lite
 RUN git clone https://github.com/simongog/sdsl-lite.git && \
     cd sdsl-lite && \
-    ./install.sh && \
-    cp /root/lib/libsdsl.a /usr/local/lib/ && \
-    ldconfig
+    mkdir -p build && cd build && \
+    cmake .. && make && make install && \
+    cd ../.. && rm -rf sdsl-lite
 
-# Install BioBloomTools
+# -------------------
+# Clone and build BTL Bloom filter library (btl_bloomfilter)
+# -------------------
+# Build and install btl_bloomfilter
+RUN git clone https://github.com/bcgsc/btl_bloomfilter.git && \
+    cd btl_bloomfilter && \
+    chmod +x autogen.sh && \
+    ./autogen.sh && \
+    ./configure --prefix=/usr/local && \
+    make && \
+    make install && \
+    mkdir -p /usr/local/include/btl_bloomfilter && \
+    mv /usr/local/include/*.hpp /usr/local/include/btl_bloomfilter/ && \
+    mv vendor /usr/local/include/btl_bloomfilter/
+
+# Clone and build BioBloom (BioBloomMaker and BioBloomCategorizer)
 RUN git clone https://github.com/bcgsc/biobloom.git && \
     cd biobloom && \
-    git submodule update --init && \
     ./autogen.sh && \
-    ./configure CXXFLAGS="-I/sdsl-lite/include -I/usr/local/include/sparsehash -Wno-error=ignored-qualifiers" LDFLAGS="-L/usr/local/lib" && \
+    ./configure CXXFLAGS="-I/usr/local/include" LDFLAGS="-L/usr/local/lib" && \
     make && \
     make install
 
-# Install HoCoRT
-RUN git clone https://github.com/ignasrum/hocort.git && \
-    cd hocort && \
+
+# -------------------
+# HoCoRT installation
+# -------------------
+RUN wget https://github.com/ignasrum/hocort/archive/refs/tags/${HOCORT_VER}.tar.gz && \
+    tar -xzf ${HOCORT_VER}.tar.gz && \
+    rm ${HOCORT_VER}.tar.gz && \
+    cd hocort-${HOCORT_VER} && \
     pip3 install .
 
-# Command to keep the container alive for further inspection/debugging
-CMD ["sleep", "infinity"]
 
 
 # Running the dockerfile and tests
@@ -88,3 +130,5 @@ COPY --from=builder /opt/ /opt/
 # Setting working directory
 RUN mkdir /data
 WORKDIR /data
+
+
