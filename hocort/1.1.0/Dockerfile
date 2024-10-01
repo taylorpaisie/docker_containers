@@ -108,7 +108,6 @@ RUN git clone https://github.com/bcgsc/biobloom.git && \
     make && \
     make install
 
-
 # -------------------
 # HoCoRT installation
 # -------------------
@@ -119,16 +118,16 @@ RUN wget https://github.com/ignasrum/hocort/archive/refs/tags/${HOCORT_VER}.tar.
     pip3 install .
 
 
-
 # Running the dockerfile and tests
 FROM ubuntu:focal AS app
 ARG HOCORT_VER
 
 COPY --from=builder /usr/ /usr/
-COPY --from=builder /opt/ /opt/
 
 # Setting working directory
 RUN mkdir /data
 WORKDIR /data
 
-
+# Verify installation
+RUN hocort --version && \
+    hocort --help
