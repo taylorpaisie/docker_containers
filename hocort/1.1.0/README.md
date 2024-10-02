@@ -33,9 +33,10 @@ Full documentation: https://github.com/ignasrum/hocort/wiki
 
 # Testing HoCoRT analysis
 ```
-hocort map \
-      --deep \
-      --verbose \
-      /root/HoCoRT2-1.20.3/data/tests/sample1_R1.fq \
-      /root/HoCoRT2-1.20.3/data/tests/sample1_R2.fq
+curl -L -o test/genome.fna https://raw.githubusercontent.com/ignasrum/hocort/main/tests/test_data/fasta/genome.fna
+
+hocort index \
+  bowtie2 \
+  --input test/genome.fna \
+  --output test/hocort_test
 ```
