@@ -18,31 +18,33 @@ LABEL maintainer.email='ltj8@cdc.gov'
 ENV DEBIAN_FRONTEND=noninteractive 
 
 # Install necessary system dependencies
-RUN apt-get update && apt-get install -y \
-        build-essential \
-        g++ \
-        unzip \
-        gcc \
-        libboost-all-dev \
-        libbz2-dev \
-        cmake \
-        python3 \
-        python3-pip \
-        git \
-        wget \
-        zlib1g-dev \
-        bowtie2 \
-        kraken2 \
-        bwa \
-        minimap2 \
-        samtools \
-        bbmap \
-        pkg-config \
-        liblzma-dev \
-        libcurl4-gnutls-dev \
-        libssl-dev \
-        libgsl-dev && \
-        apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y software-properties-common && \
+    add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get update && apt-get install -y \
+    build-essential \
+    g++ \
+    unzip \
+    gcc \
+    git \
+    wget \
+    libboost-all-dev \
+    libbz2-dev \
+    pkg-config \
+    liblzma-dev \
+    libcurl4-gnutls-dev \
+    libssl-dev \
+    libgsl-dev \
+    zlib1g-dev \
+    cmake \
+    python3.10 \
+    python3-pip \
+    bowtie2 \
+    kraken2 \
+    bwa \
+    minimap2 \
+    samtools \
+    bbmap && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # -------------------
 # BWA-MEM2 installation
