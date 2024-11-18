@@ -17,47 +17,69 @@ LABEL maintainer="Taylor K. Paisie"
 LABEL maintainer.email="ltj8@cdc.gov"
 
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Install basic dependencies
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    software-properties-common && \
+    add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+    python3.10 \
+    python3.10-distutils \
+    build-essential \
     wget \
     unzip \
-    build-essential \
-    zlib1g-dev \
-    curl \
-    python3 \
-    python3-pip \
-    git \
     samtools \
     minimap2 \
-    bowtie2 \
-    gawk \
     bedtools \
-    ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
+    gawk && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Install pip for Python 3.10
+RUN wget https://bootstrap.pypa.io/get-pip.py && \
+    python3.10 get-pip.py && \
+    rm get-pip.py && \
+    pip install setuptools && \
+    ln -sf /usr/bin/python3.10 /usr/bin/python3 && \
+    ln -sf /usr/local/bin/pip /usr/bin/pip
 
-# Install HoCoRT
+# Install bowtie2
+RUN wget https://github.com/BenLangmead/bowtie2/releases/download/v2.5.1/bowtie2-2.5.1-linux-x86_64.zip && \
+    unzip bowtie2-2.5.1-linux-x86_64.zip && \
+    mv bowtie2-2.5.1-linux-x86_64 /usr/local/bin/bowtie2 && \
+    ln -s /usr/local/bin/bowtie2/bowtie2 /usr/bin/bowtie2 && \
+    rm bowtie2-2.5.1-linux-x86_64.zip
+
+# Install hostile
 RUN wget https://github.com/bede/hostile/archive/refs/tags/${HOSTILE_VER}.tar.gz && \
-    tar -xzvf ${HOSTILE_VER}.tar.gz && cd hostile-${HOSTILE_VER} && \
-    rm -rf hostile-${HOSTILE_VER}
+    tar -xzvf ${HOSTILE_VER}.tar.gz && \
+    cd hostile-${HOSTILE_VER} && \
+    pip install . && \
+    cd .. && rm -rf hostile-${HOSTILE_VER} ${HOSTILE_VER}.tar.gz
+
 
 # Second stage: Create the final app image
-FROM ubuntu:20.04 AS app
+FROM ubuntu:focal AS app
 ARG HOSTILE_VER
 
+# Copy Python dependencies and the installed `hostile` tool
+# COPY --from=builder /usr/local/lib/python3.8/dist-packages /usr/local/lib/python3.8/dist-packages
+# COPY --from=builder /usr/local/bin/hostile /usr/local/bin/hostile
 COPY --from=builder /usr/ /usr/
 
 # Set up working directory
 WORKDIR /data
 
-# # Verify installation
-# RUN hocort --version
+# Running hostile on test staph-b test dataset
+FROM app AS test
 
-# # Optional: Test stage
-# FROM app AS test
+WORKDIR /data/test
 
-# RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl && \
-#     mkdir test && curl -L -o test/genome.fna https://raw.githubusercontent.com/ignasrum/hocort/main/tests/test_data/fasta/genome.fna && \
-#     hocort index bowtie2 --input test/genome.fna --output test/hocort_test && \
-#     rm -rf /var/lib/apt/lists/*
+# RUN wget https://github.com/bacterial-genomics/test-datasets/raw/assembly/test_data/test_miniburk_R1.fastq.gz --no-check-certificate && \
+#     wget https://github.com/bacterial-genomics/test-datasets/raw/assembly/test_data/test_miniburk_R2.fastq.gz --no-check-certificate && \
+#     hostile clean --fastq1 test_miniburk_R1.fastq.gz --fastq2 test_miniburk_R2.fastq.gz
+
+WORKDIR /data
+
 
 
