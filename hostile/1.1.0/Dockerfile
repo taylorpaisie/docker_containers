@@ -24,16 +24,22 @@ RUN apt-get update && \
     add-apt-repository ppa:deadsnakes/ppa && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
+    ca-certificates \
+    # update-ca-certificates \
     python3.10 \
     python3.10-distutils \
     build-essential \
     wget \
+    curl \
     unzip \
     samtools \
     minimap2 \
     bedtools \
     gawk && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN update-ca-certificates
+
 
 # Install pip for Python 3.10
 RUN wget https://bootstrap.pypa.io/get-pip.py && \
@@ -55,31 +61,36 @@ RUN wget https://github.com/bede/hostile/archive/refs/tags/${HOSTILE_VER}.tar.gz
     tar -xzvf ${HOSTILE_VER}.tar.gz && \
     cd hostile-${HOSTILE_VER} && \
     pip install . && \
-    cd .. && rm -rf hostile-${HOSTILE_VER} ${HOSTILE_VER}.tar.gz
+    cd .. && rm -rf ${HOSTILE_VER}.tar.gz
 
 
 # Second stage: Create the final app image
 FROM ubuntu:focal AS app
 ARG HOSTILE_VER
 
-# Copy Python dependencies and the installed `hostile` tool
-# COPY --from=builder /usr/local/lib/python3.8/dist-packages /usr/local/lib/python3.8/dist-packages
-# COPY --from=builder /usr/local/bin/hostile /usr/local/bin/hostile
+# # Copy Python dependencies and the installed `hostile` tool
+# # COPY --from=builder /usr/local/lib/python3.8/dist-packages /usr/local/lib/python3.8/dist-packages
+# # COPY --from=builder /usr/local/bin/hostile /usr/local/bin/hostile
 COPY --from=builder /usr/ /usr/
+# COPY --from=builder /hostile-${HOSTILE_VER}/ /hostile-${HOSTILE_VER}/
 
-# Set up working directory
+ENV PYTHONHTTPSVERIFY=0
+
+
+# # Set up working directory
 WORKDIR /data
 
-# Running hostile on test staph-b test dataset
+# # Running hostile on test staph-b test dataset
 FROM app AS test
 
 WORKDIR /data/test
 
-# RUN wget https://github.com/bacterial-genomics/test-datasets/raw/assembly/test_data/test_miniburk_R1.fastq.gz --no-check-certificate && \
-#     wget https://github.com/bacterial-genomics/test-datasets/raw/assembly/test_data/test_miniburk_R2.fastq.gz --no-check-certificate && \
+ RUN wget https://github.com/bacterial-genomics/test-datasets/raw/assembly/test_data/test_miniburk_R1.fastq.gz --no-check-certificate && \
+     wget https://github.com/bacterial-genomics/test-datasets/raw/assembly/test_data/test_miniburk_R2.fastq.gz --no-check-certificate
+    #  wget https://github.com/bacterial-genomics/test-datasets/raw/assembly/test_data/test_miniburk_R2.fastq.gz --no-check-certificate && \
 #     hostile clean --fastq1 test_miniburk_R1.fastq.gz --fastq2 test_miniburk_R2.fastq.gz
 
-WORKDIR /data
+# WORKDIR /data
 
 
 
