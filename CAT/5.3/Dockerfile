@@ -1,14 +1,14 @@
-# set global variables
+# Set global variables
 ARG CAT_VER="5.3"
 ARG DIAMOND_VER="2.1.9"
 
-# build Dockerfile
-FROM ubuntu:focal as builder
+# Build Stage
+FROM ubuntu:focal AS builder
 ARG CAT_VER
 ARG DIAMOND_VER
 
 LABEL base.image="ubuntu:focal"
-LABEL dockerfile.version="1"
+LABEL dockerfile.version="2"
 LABEL software="CAT"
 LABEL software.version=${CAT_VER}
 LABEL description="CAT: a tool for taxonomic classification of contigs and metagenome-assembled genomes (MAGs)."
@@ -21,81 +21,61 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    wget \
-    unzip \
-    less \
-    automake \
-    cmake \
-    zlib1g-dev\
-    libzstd-dev \
-    python3 \
-    python3-pip \
-    git \
-    prodigal \
-    build-essential &&\
-    apt-get autoclean && rm -rf /var/lib/apt/lists/*
+    wget unzip less automake cmake zlib1g-dev libzstd-dev \
+    python3 python3-pip git prodigal build-essential && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/*
 
-# install CAT dependencies
-RUN pip install --no-cache-dir \
-    certifi \
-    biopython
+# Install Python dependencies
+RUN pip install --no-cache-dir certifi biopython
 
-# clone CAT from git repo    
-RUN wget https://github.com/dutilh/CAT/archive/refs/tags/v${CAT_VER}.tar.gz &&\
-    tar xvzf v${CAT_VER}.tar.gz &&\
-    cd CAT-${CAT_VER}/ &&\
-    chmod +x CAT_pack/CAT &&\
-    cd ..
+# Clone CAT and set permissions
+RUN wget https://github.com/MGXlab/CAT_pack/archive/refs/tags/v${CAT_VER}.tar.gz && \
+    tar -xvzf v${CAT_VER}.tar.gz && \
+    chmod +x CAT_pack-${CAT_VER}/CAT_pack/CAT && \
+    rm v${CAT_VER}.tar.gz
 
-# Set CAT/BAT in path
-ENV PATH="${PATH}:/CAT/CAT_pack"
+# Add CAT to PATH
+ENV PATH="${PATH}:/CAT_pack-${CAT_VER}/CAT_pack"
 
 # Install Diamond
-RUN wget http://github.com/bbuchfink/diamond/archive/v${DIAMOND_VER}.tar.gz &&\
-    tar xzf v${DIAMOND_VER}.tar.gz &&\
-    cd diamond-${DIAMOND_VER} &&\
-    mkdir bin && cd bin &&\
-    cmake .. &&\
-    make -j4 &&\
-    make install
+RUN wget http://github.com/bbuchfink/diamond/archive/v${DIAMOND_VER}.tar.gz && \
+    tar -xzf v${DIAMOND_VER}.tar.gz && \
+    cd diamond-${DIAMOND_VER} && mkdir bin && cd bin && \
+    cmake .. && make -j$(nproc) && make install && \
+    cd ../../ && rm -rf diamond-${DIAMOND_VER}*
 
-# Running the dockerfile and tests
-FROM ubuntu:focal as app
+# Application Stage
+FROM ubuntu:focal AS app
 ARG CAT_VER
-ARG DIAMOND_VER
 
+# Install Python and Prodigal in the app stage
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 python3-pip gzip prodigal && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/*
+
+# Copy necessary files from the builder stage
+COPY --from=builder /CAT_pack-${CAT_VER}/ /CAT/
 COPY --from=builder /usr/ /usr/
-COPY --from=builder /CAT-${CAT_VER}/ /CAT/
 
-# setting CAT to PATH
+# Add CAT to PATH
 ENV PATH="${PATH}:/CAT/CAT_pack"
 
-# Setting working directory
-RUN mkdir data/ &&\
-    cd data/ &&\
-    mkdir db_tests/
-WORKDIR /data
+# Optional stage: Test data
+FROM app AS test
 
-RUN gzip -d ../CAT/tests/data/prepare/small.fa.gz
-RUN CAT prepare --db_fasta \
-    ../CAT/tests/data/prepare/small.fa \
-    --acc2tax ../CAT/tests/data/prepare/prot2acc.txt \
-    --names ../CAT/tests/data/prepare/names.dmp \
-    --nodes ../CAT/tests/data/prepare/nodes.dmp \
+WORKDIR /data/test
+
+# Prepare testing database
+RUN mkdir -p db_tests && \
+    gzip -d /CAT/tests/data/prepare/small.fa.gz && \
+    CAT prepare --db_fasta /CAT/tests/data/prepare/small.fa \
+    --acc2tax /CAT/tests/data/prepare/prot2acc.txt \
+    --names /CAT/tests/data/prepare/names.dmp \
+    --nodes /CAT/tests/data/prepare/nodes.dmp \
     --db_dir db_tests/
 
-RUN CAT contigs -c ../CAT/tests/data/contigs/small_contigs.fa \
+# Run CAT test
+RUN CAT contigs -c /CAT/tests/data/contigs/small_contigs.fa \
     -d db_tests/db/ -t db_tests/tax/
 
-# ## Test ##
-# FROM app as test
-
-# RUN apt-get update && apt-get install -y \
-#     python3 \
-#     wget
-
-# RUN mkdir ../tests/
-# COPY tests/ ../tests/
-
-
-# RUN python3 -m unittest discover -v -s ../tests
+WORKDIR /data
